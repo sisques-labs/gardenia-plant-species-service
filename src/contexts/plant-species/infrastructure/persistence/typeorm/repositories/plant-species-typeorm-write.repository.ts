@@ -45,6 +45,9 @@ export class PlantSpeciesTypeOrmWriteRepository
   ): Promise<PlantSpeciesAggregate | null> {
     const entity = await this.plantSpeciesRepo
       .createQueryBuilder('ps')
+      .leftJoinAndSelect('ps.commonNames', 'commonNames')
+      .leftJoinAndSelect('ps.images', 'images')
+      .leftJoinAndSelect('ps.externalIds', 'externalIds')
       .where('LOWER(TRIM(ps.scientific_name)) = :normalizedScientificName', {
         normalizedScientificName,
       })

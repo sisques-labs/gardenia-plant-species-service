@@ -1,5 +1,78 @@
 import { BasePaginatedResultDto } from '@sisques-labs/nestjs-kit';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+
+import { PlantSpeciesExternalIdSchemeEnum } from '@contexts/plant-species/domain/enums/plant-species-external-id-scheme.enum';
+import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
+import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
+
+@ObjectType('PlantSpeciesClassificationDto')
+export class PlantSpeciesClassificationDto {
+  @Field(() => String, { nullable: true })
+  kingdom!: string | null;
+
+  @Field(() => String, { nullable: true })
+  phylum!: string | null;
+
+  @Field(() => String, { nullable: true })
+  class!: string | null;
+
+  @Field(() => String, { nullable: true })
+  order!: string | null;
+
+  @Field(() => String, { nullable: true })
+  family!: string | null;
+
+  @Field(() => String, { nullable: true })
+  genus!: string | null;
+
+  @Field(() => String, { nullable: true })
+  specificEpithet!: string | null;
+
+  @Field(() => String, { nullable: true })
+  rank!: string | null;
+}
+
+@ObjectType('PlantSpeciesAuthorshipDto')
+export class PlantSpeciesAuthorshipDto {
+  @Field(() => String, { nullable: true })
+  author!: string | null;
+
+  @Field(() => Int, { nullable: true })
+  year!: number | null;
+}
+
+@ObjectType('PlantSpeciesCommonNameDto')
+export class PlantSpeciesCommonNameDto {
+  @Field(() => String)
+  name!: string;
+
+  @Field(() => String, { nullable: true })
+  language!: string | null;
+
+  @Field(() => PlantSpeciesSourceEnum)
+  source!: PlantSpeciesSourceEnum;
+}
+
+@ObjectType('PlantSpeciesImageDto')
+export class PlantSpeciesImageDto {
+  @Field(() => String)
+  url!: string;
+
+  @Field(() => PlantSpeciesSourceEnum)
+  source!: PlantSpeciesSourceEnum;
+
+  @Field(() => Boolean)
+  isPrimary!: boolean;
+}
+
+@ObjectType('PlantSpeciesExternalIdDto')
+export class PlantSpeciesExternalIdDto {
+  @Field(() => PlantSpeciesExternalIdSchemeEnum)
+  scheme!: PlantSpeciesExternalIdSchemeEnum;
+
+  @Field(() => String)
+  value!: string;
+}
 
 @ObjectType('PlantSpeciesResponseDto')
 export class PlantSpeciesResponseDto {
@@ -19,9 +92,57 @@ export class PlantSpeciesResponseDto {
 
   @Field(() => String, {
     nullable: true,
-    description: 'Species image URL',
+    description: 'Cover/primary species image URL',
   })
   imageUrl!: string | null;
+
+  @Field(() => PlantSpeciesClassificationDto, {
+    nullable: true,
+    description: 'Linnaean classification',
+  })
+  classification!: PlantSpeciesClassificationDto | null;
+
+  @Field(() => PlantSpeciesAuthorshipDto, {
+    nullable: true,
+    description: 'Nomenclatural authorship',
+  })
+  authorship!: PlantSpeciesAuthorshipDto | null;
+
+  @Field(() => PlantSpeciesGrowthHabitEnum, {
+    nullable: true,
+    description: 'Coarse growth form',
+  })
+  growthHabit!: PlantSpeciesGrowthHabitEnum | null;
+
+  @Field(() => String, {
+    nullable: true,
+    description: 'Wikipedia article URL',
+  })
+  wikipediaUrl!: string | null;
+
+  @Field(() => PlantSpeciesSourceEnum, {
+    description: 'Where this record originated',
+  })
+  source!: PlantSpeciesSourceEnum;
+
+  @Field(() => Date, {
+    nullable: true,
+    description: 'When the record was last enriched from external sources',
+  })
+  lastEnrichedAt!: Date | null;
+
+  @Field(() => [PlantSpeciesCommonNameDto], {
+    description: 'Vernacular (common) names',
+  })
+  commonNames!: PlantSpeciesCommonNameDto[];
+
+  @Field(() => [PlantSpeciesImageDto], { description: 'Image gallery' })
+  images!: PlantSpeciesImageDto[];
+
+  @Field(() => [PlantSpeciesExternalIdDto], {
+    description: 'External catalog cross-references',
+  })
+  externalIds!: PlantSpeciesExternalIdDto[];
 
   @Field(() => Date, { description: 'When the catalog entry was created' })
   createdAt!: Date;

@@ -12,6 +12,7 @@ import {
   IPlantSpeciesWriteRepository,
   PLANT_SPECIES_WRITE_REPOSITORY,
 } from '@contexts/plant-species/domain/repositories/write/plant-species-write.repository';
+import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 import { PlantSpeciesDescriptionValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-description/plant-species-description.value-object';
 import { PlantSpeciesImageUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image-url/plant-species-image-url.value-object';
 
@@ -103,6 +104,15 @@ export class ImportPlantSpeciesCommandHandler
           .withScientificName(scientificName)
           .withDescription(description?.value ?? null)
           .withImageUrl(imageUrl?.value ?? null)
+          .withClassification(record.classification ?? null)
+          .withAuthorship(record.authorship ?? null)
+          .withGrowthHabit(record.growthHabit ?? null)
+          .withWikipediaUrl(record.wikipediaUrl ?? null)
+          .withSource(PlantSpeciesSourceEnum.GBIF)
+          .withLastEnrichedAt(now)
+          .withCommonNames(record.commonNames ?? [])
+          .withImages(record.images ?? [])
+          .withExternalIds(record.externalIds ?? [])
           .withCreatedAt(now)
           .withUpdatedAt(now)
           .build();

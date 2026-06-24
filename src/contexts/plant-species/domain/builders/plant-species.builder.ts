@@ -5,11 +5,26 @@ import {
   FieldIsRequiredException,
 } from '@sisques-labs/nestjs-kit';
 
+import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
+import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
+import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
+import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
+import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
+import { IPlantSpeciesExternalId } from '@contexts/plant-species/domain/interfaces/plant-species-external-id.interface';
+import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
+import { PlantSpeciesAuthorshipValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-authorship/plant-species-authorship.value-object';
+import { PlantSpeciesClassificationValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-classification/plant-species-classification.value-object';
+import { PlantSpeciesCommonNameValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-common-name/plant-species-common-name.value-object';
 import { PlantSpeciesDescriptionValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-description/plant-species-description.value-object';
+import { PlantSpeciesExternalIdValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-external-id/plant-species-external-id.value-object';
+import { PlantSpeciesGrowthHabitValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-growth-habit/plant-species-growth-habit.value-object';
 import { PlantSpeciesIdValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-id/plant-species-id.value-object';
+import { PlantSpeciesImageValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image/plant-species-image.value-object';
 import { PlantSpeciesImageUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image-url/plant-species-image-url.value-object';
 import { PlantSpeciesScientificNameValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-scientific-name/plant-species-scientific-name.value-object';
+import { PlantSpeciesSourceValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-source/plant-species-source.value-object';
+import { PlantSpeciesWikipediaUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-wikipedia-url/plant-species-wikipedia-url.value-object';
 import { PlantSpeciesViewModel } from '@contexts/plant-species/domain/view-models/plant-species.view-model';
 
 @Injectable()
@@ -20,6 +35,15 @@ export class PlantSpeciesBuilder extends BaseBuilder<
   private _scientificName!: string;
   private _description: string | null = null;
   private _imageUrl: string | null = null;
+  private _classification: IPlantSpeciesClassification | null = null;
+  private _authorship: IPlantSpeciesAuthorship | null = null;
+  private _growthHabit: PlantSpeciesGrowthHabitEnum | null = null;
+  private _wikipediaUrl: string | null = null;
+  private _source: PlantSpeciesSourceEnum = PlantSpeciesSourceEnum.MANUAL;
+  private _lastEnrichedAt: Date | null = null;
+  private _commonNames: IPlantSpeciesCommonName[] = [];
+  private _images: IPlantSpeciesImage[] = [];
+  private _externalIds: IPlantSpeciesExternalId[] = [];
 
   withScientificName(scientificName: string): this {
     this._scientificName = scientificName;
@@ -33,6 +57,51 @@ export class PlantSpeciesBuilder extends BaseBuilder<
 
   withImageUrl(imageUrl: string | null): this {
     this._imageUrl = imageUrl;
+    return this;
+  }
+
+  withClassification(classification: IPlantSpeciesClassification | null): this {
+    this._classification = classification;
+    return this;
+  }
+
+  withAuthorship(authorship: IPlantSpeciesAuthorship | null): this {
+    this._authorship = authorship;
+    return this;
+  }
+
+  withGrowthHabit(growthHabit: PlantSpeciesGrowthHabitEnum | null): this {
+    this._growthHabit = growthHabit;
+    return this;
+  }
+
+  withWikipediaUrl(wikipediaUrl: string | null): this {
+    this._wikipediaUrl = wikipediaUrl;
+    return this;
+  }
+
+  withSource(source: PlantSpeciesSourceEnum): this {
+    this._source = source;
+    return this;
+  }
+
+  withLastEnrichedAt(lastEnrichedAt: Date | null): this {
+    this._lastEnrichedAt = lastEnrichedAt;
+    return this;
+  }
+
+  withCommonNames(commonNames: IPlantSpeciesCommonName[]): this {
+    this._commonNames = commonNames;
+    return this;
+  }
+
+  withImages(images: IPlantSpeciesImage[]): this {
+    this._images = images;
+    return this;
+  }
+
+  withExternalIds(externalIds: IPlantSpeciesExternalId[]): this {
+    this._externalIds = externalIds;
     return this;
   }
 
@@ -51,6 +120,36 @@ export class PlantSpeciesBuilder extends BaseBuilder<
         this._imageUrl != null
           ? new PlantSpeciesImageUrlValueObject(this._imageUrl)
           : null,
+      classification:
+        this._classification != null
+          ? new PlantSpeciesClassificationValueObject(this._classification)
+          : null,
+      authorship:
+        this._authorship != null
+          ? new PlantSpeciesAuthorshipValueObject(this._authorship)
+          : null,
+      growthHabit:
+        this._growthHabit != null
+          ? new PlantSpeciesGrowthHabitValueObject(this._growthHabit)
+          : null,
+      wikipediaUrl:
+        this._wikipediaUrl != null
+          ? new PlantSpeciesWikipediaUrlValueObject(this._wikipediaUrl)
+          : null,
+      source: new PlantSpeciesSourceValueObject(this._source),
+      lastEnrichedAt:
+        this._lastEnrichedAt != null
+          ? new DateValueObject(this._lastEnrichedAt)
+          : null,
+      commonNames: this._commonNames.map(
+        (name) => new PlantSpeciesCommonNameValueObject(name),
+      ),
+      images: this._images.map(
+        (image) => new PlantSpeciesImageValueObject(image),
+      ),
+      externalIds: this._externalIds.map(
+        (externalId) => new PlantSpeciesExternalIdValueObject(externalId),
+      ),
       createdAt: new DateValueObject(this._createdAt),
       updatedAt: new DateValueObject(this._updatedAt),
     });
@@ -63,6 +162,15 @@ export class PlantSpeciesBuilder extends BaseBuilder<
       scientificName: this._scientificName,
       description: this._description,
       imageUrl: this._imageUrl,
+      classification: this._classification,
+      authorship: this._authorship,
+      growthHabit: this._growthHabit,
+      wikipediaUrl: this._wikipediaUrl,
+      source: this._source,
+      lastEnrichedAt: this._lastEnrichedAt,
+      commonNames: this._commonNames,
+      images: this._images,
+      externalIds: this._externalIds,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
     });

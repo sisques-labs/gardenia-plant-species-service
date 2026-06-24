@@ -1,8 +1,25 @@
 # Plant Species Context
 
-Maintains the shared catalog of plant species (scientific name, description,
-image) and imports/enriches species data from external sources. Follows the
-project's DDD + CQRS + Hexagonal layering.
+Maintains the shared catalog of plant species (taxonomy, names, images,
+external references) and imports/enriches species data from external sources
+(GBIF + Wikidata). Follows the project's DDD + CQRS + Hexagonal layering.
+
+## Domain model
+
+`PlantSpeciesAggregate` holds, beyond `scientificName`/`description`/`imageUrl`:
+
+| Group | Fields | Typical source |
+|-------|--------|----------------|
+| Taxonomy | `classification` (kingdom→specificEpithet, rank), `authorship` (author, year) | GBIF |
+| Ecology / links | `growthHabit` (enum), `wikipediaUrl` | Wikidata |
+| Provenance | `source` (`GBIF`/`WIKIDATA`/`MANUAL`), `lastEnrichedAt` | — |
+| Common names | `commonNames[]` (name, language, source) → table `plant_species_common_name` | GBIF + Wikidata |
+| Images | `images[]` (url, source, isPrimary) → table `plant_species_image` | GBIF + Wikidata |
+| External ids | `externalIds[]` (scheme, value) → table `plant_species_external_id` | GBIF + Wikidata |
+
+Child collections are modelled as value-object arrays on the aggregate and persisted
+as cascaded one-to-many tables. `imageUrl` is the cover image (also present in
+`images` with `isPrimary = true`). Enums live in `domain/enums/`.
 
 ## Public API
 
@@ -28,8 +45,15 @@ project's DDD + CQRS + Hexagonal layering.
 
 | Port | Adapter | Purpose |
 |------|---------|---------|
-| `IPlantSpeciesImportPort` | `GbifPlantSpeciesImportAdapter` | Fetch/enrich species from the external catalog |
+| `IPlantSpeciesImportPort` | `GbifPlantSpeciesImportAdapter` | Fetch taxonomy/common names/images/ids from GBIF |
+| `IPlantSpeciesWikidataPort` | `WikidataPlantSpeciesAdapter` | Resolve QID, Wikipedia, common names, images and external ids from Wikidata (SPARQL) |
 | `IPlantSpeciesQueuePort` | `RedisPlantSpeciesQueueAdapter` | Enqueue species names onto the worker's Redis queue |
+
+`EnrichPlantSpeciesCommand` queries GBIF and Wikidata in parallel and merges the
+results (de-duplicating common names, images and external ids by scheme) before
+creating or updating the aggregate. `ImportPlantSpeciesCommand` populates new species
+from GBIF only. Growth habit has no canonical Wikidata property, so it is left for
+manual entry for now.
 
 ### Transport
 

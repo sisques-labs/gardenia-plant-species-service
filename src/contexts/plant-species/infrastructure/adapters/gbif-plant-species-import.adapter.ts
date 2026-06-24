@@ -6,8 +6,14 @@ import {
   IPlantSpeciesImportPort,
   PlantSpeciesImportRecord,
 } from '@contexts/plant-species/application/ports/plant-species-import.port';
+import { PlantSpeciesExternalIdSchemeEnum } from '@contexts/plant-species/domain/enums/plant-species-external-id-scheme.enum';
+import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
+import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
+import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
+import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
+import { PlantSpeciesCommonNameValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-common-name/plant-species-common-name.value-object';
 import { PlantSpeciesDescriptionValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-description/plant-species-description.value-object';
-import { PlantSpeciesImageUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image-url/plant-species-image-url.value-object';
+import { PlantSpeciesImageValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image/plant-species-image.value-object';
 
 import {
   GbifMediaResponse,
@@ -20,6 +26,8 @@ import {
 const GBIF_BASE_URL = 'https://api.gbif.org/v1';
 const REQUEST_TIMEOUT_MS = 5000;
 const VASCULAR_PLANTS_TAXON_KEY = 7707728;
+const MAX_MEDIA = 5;
+const MAX_COMMON_NAMES = 20;
 
 @Injectable()
 export class GbifPlantSpeciesImportAdapter implements IPlantSpeciesImportPort {
@@ -45,14 +53,7 @@ export class GbifPlantSpeciesImportAdapter implements IPlantSpeciesImportPort {
         return null;
       }
 
-      const { description, imageUrl } = await this.enrichFromUsageKey(
-        match.usageKey,
-      );
-      if (description == null && imageUrl == null) {
-        return null;
-      }
-
-      return { scientificName: resolvedName, description, imageUrl };
+      return this.enrichFromUsageKey(match.usageKey, resolvedName);
     } catch (error) {
       this.logger.warn(
         `GBIF enrichment lookup failed for "${scientificName}": ${error}`,
@@ -132,8 +133,7 @@ export class GbifPlantSpeciesImportAdapter implements IPlantSpeciesImportPort {
     }
 
     try {
-      const { description, imageUrl } = await this.enrichFromUsageKey(item.key);
-      return { scientificName, description, imageUrl };
+      return await this.enrichFromUsageKey(item.key, scientificName);
     } catch (error) {
       this.logger.warn(
         `GBIF enrichment failed for "${scientificName}": ${error}`,
@@ -142,18 +142,34 @@ export class GbifPlantSpeciesImportAdapter implements IPlantSpeciesImportPort {
     }
   }
 
-  private async enrichFromUsageKey(usageKey: number): Promise<{
-    description: string | null;
-    imageUrl: string | null;
-  }> {
+  private async enrichFromUsageKey(
+    usageKey: number,
+    scientificName: string,
+  ): Promise<PlantSpeciesImportRecord> {
     const [species, media] = await Promise.all([
       this.getSpecies(usageKey),
       this.getSpeciesMedia(usageKey),
     ]);
 
+    const images = this.extractImages(media);
+    const primaryImage = images.find((image) => image.isPrimary) ?? null;
+
     return {
+      scientificName,
       description: this.extractDescription(species),
-      imageUrl: this.extractImageUrl(media),
+      imageUrl: primaryImage?.url ?? null,
+      classification: this.extractClassification(species),
+      authorship: species.authorship
+        ? { author: species.authorship, year: null }
+        : null,
+      commonNames: this.extractCommonNames(species),
+      images,
+      externalIds: [
+        {
+          scheme: PlantSpeciesExternalIdSchemeEnum.GBIF,
+          value: String(usageKey),
+        },
+      ],
     };
   }
 
@@ -175,7 +191,7 @@ export class GbifPlantSpeciesImportAdapter implements IPlantSpeciesImportPort {
       this.httpService.get<GbifMediaResponse>(
         `${GBIF_BASE_URL}/species/${usageKey}/media`,
         {
-          params: { limit: 1 },
+          params: { limit: MAX_MEDIA },
           timeout: REQUEST_TIMEOUT_MS,
         },
       ),
@@ -210,14 +226,76 @@ export class GbifPlantSpeciesImportAdapter implements IPlantSpeciesImportPort {
       : null;
   }
 
-  private extractImageUrl(media: GbifMediaResponse | null): string | null {
-    const identifier = media?.results?.[0]?.identifier;
-    if (!identifier) return null;
+  private extractClassification(
+    species: GbifSpeciesResponse,
+  ): IPlantSpeciesClassification | null {
+    const classification: IPlantSpeciesClassification = {
+      kingdom: species.kingdom ?? null,
+      phylum: species.phylum ?? null,
+      class: species.class ?? null,
+      order: species.order ?? null,
+      family: species.family ?? null,
+      genus: species.genus ?? null,
+      specificEpithet: species.species ?? null,
+      rank: species.rank ?? null,
+    };
 
-    return this.truncate(
-      identifier,
-      PlantSpeciesImageUrlValueObject.MAX_LENGTH,
-    );
+    const hasAny = Object.values(classification).some((value) => value != null);
+    return hasAny ? classification : null;
+  }
+
+  private extractCommonNames(
+    species: GbifSpeciesResponse,
+  ): IPlantSpeciesCommonName[] {
+    const seen = new Set<string>();
+    const commonNames: IPlantSpeciesCommonName[] = [];
+
+    for (const entry of species.vernacularNames ?? []) {
+      const raw = entry.vernacularName?.trim();
+      if (!raw) continue;
+
+      const name = this.truncate(
+        raw,
+        PlantSpeciesCommonNameValueObject.MAX_NAME_LENGTH,
+      );
+      const language = entry.language?.trim().toLowerCase() ?? null;
+      const key = `${language ?? ''}::${name.toLowerCase()}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      commonNames.push({
+        name,
+        language,
+        source: PlantSpeciesSourceEnum.GBIF,
+      });
+
+      if (commonNames.length >= MAX_COMMON_NAMES) break;
+    }
+
+    return commonNames;
+  }
+
+  private extractImages(media: GbifMediaResponse | null): IPlantSpeciesImage[] {
+    const seen = new Set<string>();
+    const images: IPlantSpeciesImage[] = [];
+
+    for (const result of media?.results ?? []) {
+      const identifier = result.identifier?.trim();
+      if (!identifier) continue;
+      if (identifier.length > PlantSpeciesImageValueObject.MAX_URL_LENGTH) {
+        continue;
+      }
+      if (seen.has(identifier)) continue;
+      seen.add(identifier);
+
+      images.push({
+        url: identifier,
+        source: PlantSpeciesSourceEnum.GBIF,
+        isPrimary: images.length === 0,
+      });
+    }
+
+    return images;
   }
 
   private truncate(value: string, maxLength: number): string {

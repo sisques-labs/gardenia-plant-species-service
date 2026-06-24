@@ -10,10 +10,24 @@ import { PlantSpeciesDescriptionValueObject } from '@contexts/plant-species/doma
 import { PlantSpeciesIdValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-id/plant-species-id.value-object';
 import { PlantSpeciesImageUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image-url/plant-species-image-url.value-object';
 import { PlantSpeciesScientificNameValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-scientific-name/plant-species-scientific-name.value-object';
+import { PlantSpeciesSourceValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-source/plant-species-source.value-object';
+import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
 
 const PLANT_SPECIES_ID = '550e8400-e29b-41d4-a716-446655440000';
 const NOW = new Date('2024-01-01');
+
+const emptyEnrichment = {
+  classification: null,
+  authorship: null,
+  growthHabit: null,
+  wikipediaUrl: null,
+  source: new PlantSpeciesSourceValueObject(PlantSpeciesSourceEnum.MANUAL),
+  lastEnrichedAt: null,
+  commonNames: [],
+  images: [],
+  externalIds: [],
+};
 
 const buildPlantSpecies = (): PlantSpeciesAggregate =>
   new PlantSpeciesAggregate({
@@ -21,6 +35,7 @@ const buildPlantSpecies = (): PlantSpeciesAggregate =>
     scientificName: new PlantSpeciesScientificNameValueObject('Monstera'),
     description: null,
     imageUrl: null,
+    ...emptyEnrichment,
     createdAt: new DateValueObject(NOW),
     updatedAt: new DateValueObject(NOW),
   });
@@ -93,6 +108,7 @@ describe('PlantSpeciesAggregate', () => {
       scientificName: new PlantSpeciesScientificNameValueObject('Monstera'),
       description: new PlantSpeciesDescriptionValueObject('Same'),
       imageUrl: null,
+      ...emptyEnrichment,
       createdAt: new DateValueObject(NOW),
       updatedAt: new DateValueObject(NOW),
     });

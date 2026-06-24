@@ -14,6 +14,7 @@ import { UpdatePlantSpeciesCommandHandler } from './application/commands/update-
 import { PLANT_SPECIES_IMPORT_PORT } from './application/ports/plant-species-import.port';
 import { PLANT_SPECIES_QUEUE_PORT } from './application/ports/plant-species-queue.port';
 import { PLANT_SPECIES_REFERENCE_PORT } from './application/ports/plant-species-reference.port';
+import { PLANT_SPECIES_WIKIDATA_PORT } from './application/ports/plant-species-wikidata.port';
 import { PlantSpeciesFindByCriteriaQueryHandler } from './application/queries/plant-species-find-by-criteria/plant-species-find-by-criteria.handler';
 import { PlantSpeciesFindByIdQueryHandler } from './application/queries/plant-species-find-by-id/plant-species-find-by-id.handler';
 import { AssertPlantSpeciesViewModelExistsService } from './application/services/read/assert-plant-species-view-model-exists/assert-plant-species-view-model-exists.service';
@@ -26,7 +27,11 @@ import { PLANT_SPECIES_WRITE_REPOSITORY } from './domain/repositories/write/plan
 import { GbifPlantSpeciesImportAdapter } from './infrastructure/adapters/gbif-plant-species-import.adapter';
 import { PlantSpeciesReferenceAdapter } from './infrastructure/adapters/plant-species-reference.adapter';
 import { RedisPlantSpeciesQueueAdapter } from './infrastructure/adapters/redis-plant-species-queue.adapter';
+import { WikidataPlantSpeciesAdapter } from './infrastructure/adapters/wikidata-plant-species.adapter';
 import { plantSpeciesRedisClientProvider } from './infrastructure/redis/plant-species-redis.client';
+import { PlantSpeciesCommonNameTypeOrmEntity } from './infrastructure/persistence/typeorm/entities/plant-species-common-name.entity';
+import { PlantSpeciesExternalIdTypeOrmEntity } from './infrastructure/persistence/typeorm/entities/plant-species-external-id.entity';
+import { PlantSpeciesImageTypeOrmEntity } from './infrastructure/persistence/typeorm/entities/plant-species-image.entity';
 import { PlantSpeciesTypeOrmEntity } from './infrastructure/persistence/typeorm/entities/plant-species.entity';
 import { PlantSpeciesTypeOrmMapper } from './infrastructure/persistence/typeorm/mappers/plant-species-typeorm.mapper';
 import { PlantSpeciesTypeOrmReadRepository } from './infrastructure/persistence/typeorm/repositories/plant-species-typeorm-read.repository';
@@ -92,6 +97,10 @@ const INFRASTRUCTURE_ADAPTERS = [
     useClass: GbifPlantSpeciesImportAdapter,
   },
   {
+    provide: PLANT_SPECIES_WIKIDATA_PORT,
+    useClass: WikidataPlantSpeciesAdapter,
+  },
+  {
     provide: PLANT_SPECIES_QUEUE_PORT,
     useClass: RedisPlantSpeciesQueueAdapter,
   },
@@ -121,7 +130,12 @@ const MCP_TOOLS = [
   imports: [
     CqrsModule,
     HttpModule,
-    TypeOrmModule.forFeature([PlantSpeciesTypeOrmEntity]),
+    TypeOrmModule.forFeature([
+      PlantSpeciesTypeOrmEntity,
+      PlantSpeciesCommonNameTypeOrmEntity,
+      PlantSpeciesImageTypeOrmEntity,
+      PlantSpeciesExternalIdTypeOrmEntity,
+    ]),
   ],
   controllers: [...REST_CONTROLLERS],
   providers: [

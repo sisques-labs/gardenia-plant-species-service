@@ -26,6 +26,16 @@ export type GbifSpeciesVernacularNameEntry = {
 };
 
 export type GbifSpeciesResponse = {
+  key?: number;
+  kingdom?: string;
+  phylum?: string;
+  class?: string;
+  order?: string;
+  family?: string;
+  genus?: string;
+  species?: string;
+  rank?: string;
+  authorship?: string;
   descriptions?: GbifSpeciesDescriptionEntry[];
   vernacularNames?: GbifSpeciesVernacularNameEntry[];
 };
