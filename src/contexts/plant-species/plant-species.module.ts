@@ -9,8 +9,10 @@ import { CreatePlantSpeciesCommandHandler } from './application/commands/create-
 import { DeletePlantSpeciesCommandHandler } from './application/commands/delete-plant-species/delete-plant-species.handler';
 import { EnrichPlantSpeciesCommandHandler } from './application/commands/enrich-plant-species/enrich-plant-species.handler';
 import { ImportPlantSpeciesCommandHandler } from './application/commands/import-plant-species/import-plant-species.handler';
+import { IngestPlantSpeciesCommandHandler } from './application/commands/ingest-plant-species/ingest-plant-species.handler';
 import { UpdatePlantSpeciesCommandHandler } from './application/commands/update-plant-species/update-plant-species.handler';
 import { PLANT_SPECIES_IMPORT_PORT } from './application/ports/plant-species-import.port';
+import { PLANT_SPECIES_QUEUE_PORT } from './application/ports/plant-species-queue.port';
 import { PLANT_SPECIES_REFERENCE_PORT } from './application/ports/plant-species-reference.port';
 import { PlantSpeciesFindByCriteriaQueryHandler } from './application/queries/plant-species-find-by-criteria/plant-species-find-by-criteria.handler';
 import { PlantSpeciesFindByIdQueryHandler } from './application/queries/plant-species-find-by-id/plant-species-find-by-id.handler';
@@ -23,6 +25,8 @@ import { PLANT_SPECIES_READ_REPOSITORY } from './domain/repositories/read/plant-
 import { PLANT_SPECIES_WRITE_REPOSITORY } from './domain/repositories/write/plant-species-write.repository';
 import { GbifPlantSpeciesImportAdapter } from './infrastructure/adapters/gbif-plant-species-import.adapter';
 import { PlantSpeciesReferenceAdapter } from './infrastructure/adapters/plant-species-reference.adapter';
+import { RedisPlantSpeciesQueueAdapter } from './infrastructure/adapters/redis-plant-species-queue.adapter';
+import { plantSpeciesRedisClientProvider } from './infrastructure/redis/plant-species-redis.client';
 import { PlantSpeciesTypeOrmEntity } from './infrastructure/persistence/typeorm/entities/plant-species.entity';
 import { PlantSpeciesTypeOrmMapper } from './infrastructure/persistence/typeorm/mappers/plant-species-typeorm.mapper';
 import { PlantSpeciesTypeOrmReadRepository } from './infrastructure/persistence/typeorm/repositories/plant-species-typeorm-read.repository';
@@ -33,6 +37,7 @@ import { PlantSpeciesEnrichMcpTool } from './transport/mcp/tools/plant-species-e
 import { PlantSpeciesFindByCriteriaMcpTool } from './transport/mcp/tools/plant-species-find-by-criteria.tool';
 import { PlantSpeciesFindByIdMcpTool } from './transport/mcp/tools/plant-species-find-by-id.tool';
 import { PlantSpeciesImportMcpTool } from './transport/mcp/tools/plant-species-import.tool';
+import { PlantSpeciesIngestMcpTool } from './transport/mcp/tools/plant-species-ingest.tool';
 import { PlantSpeciesUpdateMcpTool } from './transport/mcp/tools/plant-species-update.tool';
 import { PlantSpeciesGraphQLMapper } from './transport/graphql/mappers/plant-species.mapper';
 import { PlantSpeciesMutationsResolver } from './transport/graphql/resolvers/plant-species-mutations.resolver';
@@ -46,6 +51,7 @@ const COMMAND_HANDLERS = [
   DeletePlantSpeciesCommandHandler,
   EnrichPlantSpeciesCommandHandler,
   ImportPlantSpeciesCommandHandler,
+  IngestPlantSpeciesCommandHandler,
 ];
 
 const QUERY_HANDLERS = [
@@ -76,6 +82,7 @@ const INFRASTRUCTURE_REPOSITORIES = [
 ];
 
 const INFRASTRUCTURE_ADAPTERS = [
+  plantSpeciesRedisClientProvider,
   {
     provide: PLANT_SPECIES_REFERENCE_PORT,
     useClass: PlantSpeciesReferenceAdapter,
@@ -83,6 +90,10 @@ const INFRASTRUCTURE_ADAPTERS = [
   {
     provide: PLANT_SPECIES_IMPORT_PORT,
     useClass: GbifPlantSpeciesImportAdapter,
+  },
+  {
+    provide: PLANT_SPECIES_QUEUE_PORT,
+    useClass: RedisPlantSpeciesQueueAdapter,
   },
 ];
 
@@ -101,6 +112,7 @@ const MCP_TOOLS = [
   PlantSpeciesDeleteMcpTool,
   PlantSpeciesEnrichMcpTool,
   PlantSpeciesImportMcpTool,
+  PlantSpeciesIngestMcpTool,
   PlantSpeciesFindByIdMcpTool,
   PlantSpeciesFindByCriteriaMcpTool,
 ];

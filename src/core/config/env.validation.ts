@@ -25,6 +25,11 @@ const baseEnvSchema = z.object({
     .string()
     .trim()
     .min(1, 'DATABASE_DATABASE must not be empty'),
+  // Redis is optional in validation: every field has a sensible default in redis.config.ts
+  // (localhost:6379, queue "plant-species"), so local/dev boots without extra env.
+  REDIS_HOST: z.string().optional(),
+  REDIS_PORT: z.string().optional(),
+  REDIS_QUEUE: z.string().optional(),
 });
 
 export function validateEnv(

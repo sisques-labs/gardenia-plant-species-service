@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Param,
   Patch,
   Post,
@@ -15,12 +16,16 @@ import { Criteria, PaginatedResult } from '@sisques-labs/nestjs-kit';
 
 import { CreatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/create-plant-species/create-plant-species.command';
 import { DeletePlantSpeciesCommand } from '@contexts/plant-species/application/commands/delete-plant-species/delete-plant-species.command';
+import { IngestPlantSpeciesCommand } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.command';
+import { IngestPlantSpeciesResult } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.handler';
 import { UpdatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/update-plant-species/update-plant-species.command';
 import { PlantSpeciesFindByCriteriaQuery } from '@contexts/plant-species/application/queries/plant-species-find-by-criteria/plant-species-find-by-criteria.query';
 import { PlantSpeciesFindByIdQuery } from '@contexts/plant-species/application/queries/plant-species-find-by-id/plant-species-find-by-id.query';
 import { PlantSpeciesViewModel } from '@contexts/plant-species/domain/view-models/plant-species.view-model';
 
 import { CreatePlantSpeciesDto } from '@contexts/plant-species/transport/rest/dtos/create-plant-species.dto';
+import { IngestPlantSpeciesDto } from '@contexts/plant-species/transport/rest/dtos/ingest-plant-species.dto';
+import { IngestPlantSpeciesResponseDto } from '@contexts/plant-species/transport/rest/dtos/ingest-plant-species-response.dto';
 import { PlantSpeciesRestResponseDto } from '@contexts/plant-species/transport/rest/dtos/plant-species-rest-response.dto';
 import { UpdatePlantSpeciesDto } from '@contexts/plant-species/transport/rest/dtos/update-plant-species.dto';
 import { PlantSpeciesRestMapper } from '@contexts/plant-species/transport/rest/mappers/plant-species/plant-species.mapper';
@@ -28,11 +33,35 @@ import { PlantSpeciesRestMapper } from '@contexts/plant-species/transport/rest/m
 @ApiTags('plant-species')
 @Controller('plant-species')
 export class PlantSpeciesController {
+  private readonly logger = new Logger(PlantSpeciesController.name);
+
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly plantSpeciesRestMapper: PlantSpeciesRestMapper,
   ) {}
+
+  @Post('ingest')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({
+    summary:
+      'Enqueue plant species names for asynchronous ingestion by the worker',
+  })
+  @ApiResponse({
+    status: 202,
+    description: 'Species names accepted and enqueued',
+    type: IngestPlantSpeciesResponseDto,
+  })
+  async ingestPlantSpecies(
+    @Body() dto: IngestPlantSpeciesDto,
+  ): Promise<IngestPlantSpeciesResponseDto> {
+    this.logger.log(`Ingesting ${dto.names.length} plant species name(s)`);
+
+    return this.commandBus.execute<
+      IngestPlantSpeciesCommand,
+      IngestPlantSpeciesResult
+    >(new IngestPlantSpeciesCommand({ names: dto.names }));
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

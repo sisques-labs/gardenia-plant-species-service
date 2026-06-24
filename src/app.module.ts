@@ -1,6 +1,7 @@
 import { appConfig } from '@core/config/app.config';
 import { validateEnv } from '@core/config/env.validation';
 import { postgresConfig } from '@core/config/postgres.config';
+import { redisConfig } from '@core/config/redis.config';
 import { HealthModule } from '@core/health/health.module';
 import { McpModule } from '@core/mcp/mcp.module';
 import '@core/transport/graphql/registered-enums.graphql';
@@ -23,7 +24,7 @@ import { SupportModule } from './support/support.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnv,
-      load: [postgresConfig, appConfig],
+      load: [postgresConfig, appConfig, redisConfig],
       cache: true,
     }),
     TypeOrmModule.forRootAsync({

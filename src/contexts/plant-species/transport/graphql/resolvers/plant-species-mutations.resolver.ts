@@ -10,14 +10,18 @@ import { CreatePlantSpeciesCommand } from '@contexts/plant-species/application/c
 import { DeletePlantSpeciesCommand } from '@contexts/plant-species/application/commands/delete-plant-species/delete-plant-species.command';
 import { EnrichPlantSpeciesCommand } from '@contexts/plant-species/application/commands/enrich-plant-species/enrich-plant-species.command';
 import { ImportPlantSpeciesCommand } from '@contexts/plant-species/application/commands/import-plant-species/import-plant-species.command';
+import { IngestPlantSpeciesCommand } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.command';
+import { IngestPlantSpeciesResult } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.handler';
 import { UpdatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/update-plant-species/update-plant-species.command';
 
 import { PlantSpeciesCreateRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-create.request.dto';
 import { PlantSpeciesDeleteRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-delete.request.dto';
 import { PlantSpeciesEnrichRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-enrich.request.dto';
 import { PlantSpeciesImportRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-import.request.dto';
+import { PlantSpeciesIngestRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-ingest.request.dto';
 import { PlantSpeciesUpdateRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-update.request.dto';
 import { ImportPlantSpeciesResultResponseDto } from '@contexts/plant-species/transport/graphql/dtos/responses/import-plant-species-result.response.dto';
+import { IngestPlantSpeciesResultResponseDto } from '@contexts/plant-species/transport/graphql/dtos/responses/ingest-plant-species-result.response.dto';
 
 @Resolver()
 export class PlantSpeciesMutationsResolver {
@@ -132,5 +136,17 @@ export class PlantSpeciesMutationsResolver {
         offset: input.offset,
       }),
     );
+  }
+
+  @Mutation(() => IngestPlantSpeciesResultResponseDto)
+  async ingestPlantSpecies(
+    @Args('input') input: PlantSpeciesIngestRequestDto,
+  ): Promise<IngestPlantSpeciesResultResponseDto> {
+    this.logger.log(`Ingesting ${input.names.length} plant species name(s)`);
+
+    return this.commandBus.execute<
+      IngestPlantSpeciesCommand,
+      IngestPlantSpeciesResult
+    >(new IngestPlantSpeciesCommand({ names: input.names }));
   }
 }

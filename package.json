@@ -49,6 +49,7 @@
     "express": "^5.2.1",
     "graphql": "^16.14.0",
     "graphql-query-complexity": "^1.1.1",
+    "ioredis": "^5.4.1",
     "mongodb": "^7.3.0",
     "nest-winston": "^1.10.2",
     "pg": "^8.21.0",
