@@ -1,8 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { PlantSpeciesExternalIdSchemeEnum } from '@contexts/plant-species/domain/enums/plant-species-external-id-scheme.enum';
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 
 export class PlantSpeciesClassificationRestDto {
   @ApiPropertyOptional({ nullable: true }) kingdom!: string | null;
@@ -27,20 +25,15 @@ export class PlantSpeciesCommonNameRestDto {
   @ApiProperty({ example: 'Dog rose' }) name!: string;
   @ApiPropertyOptional({ nullable: true, example: 'en' })
   language!: string | null;
-  @ApiProperty({ enum: PlantSpeciesSourceEnum })
-  source!: PlantSpeciesSourceEnum;
 }
 
 export class PlantSpeciesImageRestDto {
   @ApiProperty({ example: 'https://example.com/rosa.jpg' }) url!: string;
-  @ApiProperty({ enum: PlantSpeciesSourceEnum })
-  source!: PlantSpeciesSourceEnum;
   @ApiProperty({ example: true }) isPrimary!: boolean;
 }
 
 export class PlantSpeciesExternalIdRestDto {
-  @ApiProperty({ enum: PlantSpeciesExternalIdSchemeEnum })
-  scheme!: PlantSpeciesExternalIdSchemeEnum;
+  @ApiProperty({ example: 'GBIF' }) scheme!: string;
   @ApiProperty({ example: '2705959' }) value!: string;
 }
 
@@ -88,18 +81,6 @@ export class PlantSpeciesRestResponseDto {
     description: 'Wikipedia article URL',
   })
   wikipediaUrl!: string | null;
-
-  @ApiProperty({
-    enum: PlantSpeciesSourceEnum,
-    description: 'Where this record originated',
-  })
-  source!: PlantSpeciesSourceEnum;
-
-  @ApiPropertyOptional({
-    nullable: true,
-    description: 'When the record was last enriched from external sources',
-  })
-  lastEnrichedAt!: Date | null;
 
   @ApiProperty({ type: [PlantSpeciesCommonNameRestDto] })
   commonNames!: PlantSpeciesCommonNameRestDto[];

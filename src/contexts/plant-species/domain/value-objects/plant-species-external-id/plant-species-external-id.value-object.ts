@@ -1,9 +1,9 @@
 import { ValueObject } from '@sisques-labs/nestjs-kit';
 
-import { PlantSpeciesExternalIdSchemeEnum } from '@contexts/plant-species/domain/enums/plant-species-external-id-scheme.enum';
 import { IPlantSpeciesExternalId } from '@contexts/plant-species/domain/interfaces/plant-species-external-id.interface';
 
 export class PlantSpeciesExternalIdValueObject extends ValueObject<IPlantSpeciesExternalId> {
+  static readonly MAX_SCHEME_LENGTH = 32;
   static readonly MAX_VALUE_LENGTH = 255;
 
   private readonly _value: IPlantSpeciesExternalId;
@@ -11,7 +11,7 @@ export class PlantSpeciesExternalIdValueObject extends ValueObject<IPlantSpecies
   constructor(value: IPlantSpeciesExternalId) {
     super();
     this._value = {
-      scheme: value.scheme,
+      scheme: value.scheme.trim(),
       value: value.value.trim(),
     };
     this.validate();
@@ -22,13 +22,15 @@ export class PlantSpeciesExternalIdValueObject extends ValueObject<IPlantSpecies
   }
 
   protected validate(): void {
+    if (this._value.scheme.length === 0) {
+      throw new Error('Plant species external id scheme must not be empty');
+    }
     if (
-      !Object.values(PlantSpeciesExternalIdSchemeEnum).includes(
-        this._value.scheme,
-      )
+      this._value.scheme.length >
+      PlantSpeciesExternalIdValueObject.MAX_SCHEME_LENGTH
     ) {
       throw new Error(
-        `Invalid plant species external id scheme: ${this._value.scheme}`,
+        `Plant species external id scheme exceeds ${PlantSpeciesExternalIdValueObject.MAX_SCHEME_LENGTH} characters`,
       );
     }
     if (this._value.value.length === 0) {

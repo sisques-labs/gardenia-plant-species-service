@@ -6,7 +6,6 @@ import {
 } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
 import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
 import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
@@ -23,7 +22,6 @@ import { PlantSpeciesIdValueObject } from '@contexts/plant-species/domain/value-
 import { PlantSpeciesImageValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image/plant-species-image.value-object';
 import { PlantSpeciesImageUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image-url/plant-species-image-url.value-object';
 import { PlantSpeciesScientificNameValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-scientific-name/plant-species-scientific-name.value-object';
-import { PlantSpeciesSourceValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-source/plant-species-source.value-object';
 import { PlantSpeciesWikipediaUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-wikipedia-url/plant-species-wikipedia-url.value-object';
 import { PlantSpeciesViewModel } from '@contexts/plant-species/domain/view-models/plant-species.view-model';
 
@@ -39,8 +37,6 @@ export class PlantSpeciesBuilder extends BaseBuilder<
   private _authorship: IPlantSpeciesAuthorship | null = null;
   private _growthHabit: PlantSpeciesGrowthHabitEnum | null = null;
   private _wikipediaUrl: string | null = null;
-  private _source: PlantSpeciesSourceEnum = PlantSpeciesSourceEnum.MANUAL;
-  private _lastEnrichedAt: Date | null = null;
   private _commonNames: IPlantSpeciesCommonName[] = [];
   private _images: IPlantSpeciesImage[] = [];
   private _externalIds: IPlantSpeciesExternalId[] = [];
@@ -77,16 +73,6 @@ export class PlantSpeciesBuilder extends BaseBuilder<
 
   withWikipediaUrl(wikipediaUrl: string | null): this {
     this._wikipediaUrl = wikipediaUrl;
-    return this;
-  }
-
-  withSource(source: PlantSpeciesSourceEnum): this {
-    this._source = source;
-    return this;
-  }
-
-  withLastEnrichedAt(lastEnrichedAt: Date | null): this {
-    this._lastEnrichedAt = lastEnrichedAt;
     return this;
   }
 
@@ -136,11 +122,6 @@ export class PlantSpeciesBuilder extends BaseBuilder<
         this._wikipediaUrl != null
           ? new PlantSpeciesWikipediaUrlValueObject(this._wikipediaUrl)
           : null,
-      source: new PlantSpeciesSourceValueObject(this._source),
-      lastEnrichedAt:
-        this._lastEnrichedAt != null
-          ? new DateValueObject(this._lastEnrichedAt)
-          : null,
       commonNames: this._commonNames.map(
         (name) => new PlantSpeciesCommonNameValueObject(name),
       ),
@@ -166,8 +147,6 @@ export class PlantSpeciesBuilder extends BaseBuilder<
       authorship: this._authorship,
       growthHabit: this._growthHabit,
       wikipediaUrl: this._wikipediaUrl,
-      source: this._source,
-      lastEnrichedAt: this._lastEnrichedAt,
       commonNames: this._commonNames,
       images: this._images,
       externalIds: this._externalIds,

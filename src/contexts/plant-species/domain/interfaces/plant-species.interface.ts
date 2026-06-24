@@ -10,7 +10,6 @@ import { PlantSpeciesIdValueObject } from '@contexts/plant-species/domain/value-
 import { PlantSpeciesImageValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image/plant-species-image.value-object';
 import { PlantSpeciesImageUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-image-url/plant-species-image-url.value-object';
 import { PlantSpeciesScientificNameValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-scientific-name/plant-species-scientific-name.value-object';
-import { PlantSpeciesSourceValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-source/plant-species-source.value-object';
 import { PlantSpeciesWikipediaUrlValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-wikipedia-url/plant-species-wikipedia-url.value-object';
 
 export interface IPlantSpecies {
@@ -22,8 +21,6 @@ export interface IPlantSpecies {
   authorship: PlantSpeciesAuthorshipValueObject | null;
   growthHabit: PlantSpeciesGrowthHabitValueObject | null;
   wikipediaUrl: PlantSpeciesWikipediaUrlValueObject | null;
-  source: PlantSpeciesSourceValueObject;
-  lastEnrichedAt: DateValueObject | null;
   commonNames: PlantSpeciesCommonNameValueObject[];
   images: PlantSpeciesImageValueObject[];
   externalIds: PlantSpeciesExternalIdValueObject[];

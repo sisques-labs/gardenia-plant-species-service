@@ -1,7 +1,6 @@
 import { BaseViewModel } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
 import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
 import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
@@ -17,8 +16,6 @@ export class PlantSpeciesViewModel extends BaseViewModel {
   public readonly authorship: IPlantSpeciesAuthorship | null;
   public readonly growthHabit: PlantSpeciesGrowthHabitEnum | null;
   public readonly wikipediaUrl: string | null;
-  public readonly source: PlantSpeciesSourceEnum;
-  public readonly lastEnrichedAt: Date | null;
   public readonly commonNames: IPlantSpeciesCommonName[];
   public readonly images: IPlantSpeciesImage[];
   public readonly externalIds: IPlantSpeciesExternalId[];
@@ -32,8 +29,6 @@ export class PlantSpeciesViewModel extends BaseViewModel {
     this.authorship = props.authorship;
     this.growthHabit = props.growthHabit;
     this.wikipediaUrl = props.wikipediaUrl;
-    this.source = props.source;
-    this.lastEnrichedAt = props.lastEnrichedAt;
     this.commonNames = props.commonNames;
     this.images = props.images;
     this.externalIds = props.externalIds;

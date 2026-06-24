@@ -1,25 +1,30 @@
 # Plant Species Context
 
-Maintains the shared catalog of plant species (taxonomy, names, images,
-external references) and imports/enriches species data from external sources
-(GBIF + Wikidata). Follows the project's DDD + CQRS + Hexagonal layering.
+Owns the plant species catalog: it **stores and serves** species data and
+**enqueues** species names for the worker to process. Fetching data from
+external sources (GBIF, Wikidata, …) is **not** this service's responsibility —
+that lives in `gardenia-plant-species-worker`, which writes the enriched data
+back into the shared database. Follows the project's DDD + CQRS + Hexagonal
+layering.
 
 ## Domain model
 
 `PlantSpeciesAggregate` holds, beyond `scientificName`/`description`/`imageUrl`:
 
-| Group | Fields | Typical source |
-|-------|--------|----------------|
-| Taxonomy | `classification` (kingdom→specificEpithet, rank), `authorship` (author, year) | GBIF |
-| Ecology / links | `growthHabit` (enum), `wikipediaUrl` | Wikidata |
-| Provenance | `source` (`GBIF`/`WIKIDATA`/`MANUAL`), `lastEnrichedAt` | — |
-| Common names | `commonNames[]` (name, language, source) → table `plant_species_common_name` | GBIF + Wikidata |
-| Images | `images[]` (url, source, isPrimary) → table `plant_species_image` | GBIF + Wikidata |
-| External ids | `externalIds[]` (scheme, value) → table `plant_species_external_id` | GBIF + Wikidata |
+| Group | Fields | Storage |
+|-------|--------|---------|
+| Taxonomy | `classification` (kingdom→specificEpithet, rank), `authorship` (author, year) | columns on `plant_species` |
+| Ecology / links | `growthHabit` (enum), `wikipediaUrl` | columns on `plant_species` |
+| Common names | `commonNames[]` (name, language) | table `plant_species_common_name` |
+| Images | `images[]` (url, isPrimary) | table `plant_species_image` |
+| External ids | `externalIds[]` (scheme, value) | table `plant_species_external_id` |
 
+`scheme` on external ids is a free-form string (e.g. `"GBIF"`, `"WIKIDATA"`,
+`"POWO"`) set by the worker — the service does not couple to any specific source.
 Child collections are modelled as value-object arrays on the aggregate and persisted
 as cascaded one-to-many tables. `imageUrl` is the cover image (also present in
-`images` with `isPrimary = true`). Enums live in `domain/enums/`.
+`images` with `isPrimary = true`). The rich fields are written by the worker
+directly into the shared DB; this service reads and serves them.
 
 ## Public API
 
@@ -30,8 +35,6 @@ as cascaded one-to-many tables. `imageUrl` is the cover image (also present in
 | `CreatePlantSpeciesCommand` | Add a species to the catalog |
 | `UpdatePlantSpeciesCommand` | Update a species |
 | `DeletePlantSpeciesCommand` | Remove a species |
-| `EnrichPlantSpeciesCommand` | Enrich a species from external data |
-| `ImportPlantSpeciesCommand` | Import a batch from the external catalog |
 | `IngestPlantSpeciesCommand` | Enqueue species names for the worker to consume |
 
 ### Queries
@@ -45,15 +48,8 @@ as cascaded one-to-many tables. `imageUrl` is the cover image (also present in
 
 | Port | Adapter | Purpose |
 |------|---------|---------|
-| `IPlantSpeciesImportPort` | `GbifPlantSpeciesImportAdapter` | Fetch taxonomy/common names/images/ids from GBIF |
-| `IPlantSpeciesWikidataPort` | `WikidataPlantSpeciesAdapter` | Resolve QID, Wikipedia, common names, images and external ids from Wikidata (SPARQL) |
 | `IPlantSpeciesQueuePort` | `RedisPlantSpeciesQueueAdapter` | Enqueue species names onto the worker's Redis queue |
-
-`EnrichPlantSpeciesCommand` queries GBIF and Wikidata in parallel and merges the
-results (de-duplicating common names, images and external ids by scheme) before
-creating or updating the aggregate. `ImportPlantSpeciesCommand` populates new species
-from GBIF only. Growth habit has no canonical Wikidata property, so it is left for
-manual entry for now.
+| `IPlantSpeciesReferencePort` | `PlantSpeciesReferenceAdapter` | Count plants referencing a species (delete guard) |
 
 ### Transport
 
@@ -65,8 +61,10 @@ manual entry for now.
 
 `IngestPlantSpeciesCommand` pushes each species name as a plain string onto a Redis
 list (config `redis.queueName`, default `plant-species`) via `IPlantSpeciesQueuePort`.
-The `gardenia-plant-species-worker` drains that list with `BRPOP`. The queue name MUST
-match the worker's `QUEUE_NAME`. Order is preserved (single `LPUSH` + tail `BRPOP`).
+The `gardenia-plant-species-worker` drains that list with `BRPOP`, fetches the data
+from external sources, and persists the enriched species into the shared database.
+The queue name MUST match the worker's `QUEUE_NAME`. Order is preserved
+(single `LPUSH` + tail `BRPOP`).
 
 ## MCP Tools
 
@@ -78,8 +76,6 @@ Each tool dispatches through the Command/Query bus.
 | `plant_species_create` | Create a species |
 | `plant_species_update` | Update a species |
 | `plant_species_delete` | Delete a species |
-| `plant_species_enrich` | Enrich a species from external data |
-| `plant_species_import` | Import a batch of species |
 | `plant_species_ingest` | Enqueue species names for the worker |
 | `plant_species_find_by_id` | Get a species by id |
 | `plant_species_find_by_criteria` | Paginated list of species |

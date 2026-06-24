@@ -16,8 +16,6 @@ export class PlantSpeciesRestMapper {
     dto.authorship = vm.authorship;
     dto.growthHabit = vm.growthHabit;
     dto.wikipediaUrl = vm.wikipediaUrl;
-    dto.source = vm.source;
-    dto.lastEnrichedAt = vm.lastEnrichedAt;
     dto.commonNames = vm.commonNames;
     dto.images = vm.images;
     dto.externalIds = vm.externalIds;

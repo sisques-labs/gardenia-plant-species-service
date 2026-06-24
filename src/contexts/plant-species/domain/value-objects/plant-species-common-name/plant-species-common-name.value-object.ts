@@ -1,6 +1,5 @@
 import { ValueObject } from '@sisques-labs/nestjs-kit';
 
-import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
 
 export class PlantSpeciesCommonNameValueObject extends ValueObject<IPlantSpeciesCommonName> {
@@ -15,7 +14,6 @@ export class PlantSpeciesCommonNameValueObject extends ValueObject<IPlantSpecies
     this._value = {
       name: value.name.trim(),
       language: language != null && language.length > 0 ? language : null,
-      source: value.source,
     };
     this.validate();
   }
@@ -43,11 +41,6 @@ export class PlantSpeciesCommonNameValueObject extends ValueObject<IPlantSpecies
     ) {
       throw new Error(
         `Plant species common name language exceeds ${PlantSpeciesCommonNameValueObject.MAX_LANGUAGE_LENGTH} characters`,
-      );
-    }
-    if (!Object.values(PlantSpeciesSourceEnum).includes(this._value.source)) {
-      throw new Error(
-        `Invalid plant species common name source: ${this._value.source}`,
       );
     }
   }

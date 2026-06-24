@@ -87,14 +87,6 @@ export class PlantSpeciesTypeOrmEntity {
   })
   wikipediaUrl!: string | null;
 
-  // --- Provenance ---
-
-  @Column({ type: 'varchar', length: 32, nullable: false, default: 'MANUAL' })
-  source!: string;
-
-  @Column({ name: 'last_enriched_at', type: 'timestamp', nullable: true })
-  lastEnrichedAt!: Date | null;
-
   // --- Child collections (loaded eagerly, cascaded on save) ---
 
   @OneToMany(

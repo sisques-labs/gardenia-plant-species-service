@@ -28,8 +28,6 @@ export class PlantSpeciesGraphQLMapper {
       authorship: vm.authorship,
       growthHabit: vm.growthHabit,
       wikipediaUrl: vm.wikipediaUrl,
-      source: vm.source,
-      lastEnrichedAt: vm.lastEnrichedAt,
       commonNames: vm.commonNames,
       images: vm.images,
       externalIds: vm.externalIds,

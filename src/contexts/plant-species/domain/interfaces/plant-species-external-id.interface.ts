@@ -1,7 +1,6 @@
-import { PlantSpeciesExternalIdSchemeEnum } from '@contexts/plant-species/domain/enums/plant-species-external-id-scheme.enum';
-
-/** Cross-reference of this species in an external catalog (GBIF, Wikidata, …). */
+/** Cross-reference of this species in an external catalog. */
 export interface IPlantSpeciesExternalId {
-  scheme: PlantSpeciesExternalIdSchemeEnum;
+  /** Catalog identifier, e.g. "GBIF", "WIKIDATA", "POWO". Free-form. */
+  scheme: string;
   value: string;
 }

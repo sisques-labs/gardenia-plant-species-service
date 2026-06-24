@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { PlantSpeciesExternalIdSchemeEnum } from '@contexts/plant-species/domain/enums/plant-species-external-id-scheme.enum';
-import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
 import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
@@ -28,28 +26,21 @@ export class PlantSpeciesTypeOrmMapper {
         (entity.growthHabit as PlantSpeciesGrowthHabitEnum | null) ?? null,
       )
       .withWikipediaUrl(entity.wikipediaUrl ?? null)
-      .withSource(
-        (entity.source as PlantSpeciesSourceEnum) ??
-          PlantSpeciesSourceEnum.MANUAL,
-      )
-      .withLastEnrichedAt(entity.lastEnrichedAt ?? null)
       .withCommonNames(
         (entity.commonNames ?? []).map((commonName) => ({
           name: commonName.name,
           language: commonName.language ?? null,
-          source: commonName.source as PlantSpeciesSourceEnum,
         })),
       )
       .withImages(
         (entity.images ?? []).map((image) => ({
           url: image.url,
-          source: image.source as PlantSpeciesSourceEnum,
           isPrimary: image.isPrimary,
         })),
       )
       .withExternalIds(
         (entity.externalIds ?? []).map((externalId) => ({
-          scheme: externalId.scheme as PlantSpeciesExternalIdSchemeEnum,
+          scheme: externalId.scheme,
           value: externalId.value,
         })),
       )
@@ -83,15 +74,12 @@ export class PlantSpeciesTypeOrmMapper {
 
     entity.growthHabit = primitives.growthHabit;
     entity.wikipediaUrl = primitives.wikipediaUrl;
-    entity.source = primitives.source;
-    entity.lastEnrichedAt = primitives.lastEnrichedAt;
 
     entity.commonNames = primitives.commonNames.map((commonName) => {
       const child = new PlantSpeciesCommonNameTypeOrmEntity();
       child.plantSpeciesId = primitives.id;
       child.name = commonName.name;
       child.language = commonName.language;
-      child.source = commonName.source;
       return child;
     });
 
@@ -99,7 +87,6 @@ export class PlantSpeciesTypeOrmMapper {
       const child = new PlantSpeciesImageTypeOrmEntity();
       child.plantSpeciesId = primitives.id;
       child.url = image.url;
-      child.source = image.source;
       child.isPrimary = image.isPrimary;
       return child;
     });

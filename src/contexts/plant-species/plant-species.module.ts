@@ -1,20 +1,15 @@
 import '@contexts/plant-species/transport/graphql/enums/plant-species-registered-enums.graphql';
 
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CreatePlantSpeciesCommandHandler } from './application/commands/create-plant-species/create-plant-species.handler';
 import { DeletePlantSpeciesCommandHandler } from './application/commands/delete-plant-species/delete-plant-species.handler';
-import { EnrichPlantSpeciesCommandHandler } from './application/commands/enrich-plant-species/enrich-plant-species.handler';
-import { ImportPlantSpeciesCommandHandler } from './application/commands/import-plant-species/import-plant-species.handler';
 import { IngestPlantSpeciesCommandHandler } from './application/commands/ingest-plant-species/ingest-plant-species.handler';
 import { UpdatePlantSpeciesCommandHandler } from './application/commands/update-plant-species/update-plant-species.handler';
-import { PLANT_SPECIES_IMPORT_PORT } from './application/ports/plant-species-import.port';
 import { PLANT_SPECIES_QUEUE_PORT } from './application/ports/plant-species-queue.port';
 import { PLANT_SPECIES_REFERENCE_PORT } from './application/ports/plant-species-reference.port';
-import { PLANT_SPECIES_WIKIDATA_PORT } from './application/ports/plant-species-wikidata.port';
 import { PlantSpeciesFindByCriteriaQueryHandler } from './application/queries/plant-species-find-by-criteria/plant-species-find-by-criteria.handler';
 import { PlantSpeciesFindByIdQueryHandler } from './application/queries/plant-species-find-by-id/plant-species-find-by-id.handler';
 import { AssertPlantSpeciesViewModelExistsService } from './application/services/read/assert-plant-species-view-model-exists/assert-plant-species-view-model-exists.service';
@@ -24,10 +19,8 @@ import { AssertPlantSpeciesNotInUseService } from './application/services/write/
 import { PlantSpeciesBuilder } from './domain/builders/plant-species.builder';
 import { PLANT_SPECIES_READ_REPOSITORY } from './domain/repositories/read/plant-species-read.repository';
 import { PLANT_SPECIES_WRITE_REPOSITORY } from './domain/repositories/write/plant-species-write.repository';
-import { GbifPlantSpeciesImportAdapter } from './infrastructure/adapters/gbif-plant-species-import.adapter';
 import { PlantSpeciesReferenceAdapter } from './infrastructure/adapters/plant-species-reference.adapter';
 import { RedisPlantSpeciesQueueAdapter } from './infrastructure/adapters/redis-plant-species-queue.adapter';
-import { WikidataPlantSpeciesAdapter } from './infrastructure/adapters/wikidata-plant-species.adapter';
 import { plantSpeciesRedisClientProvider } from './infrastructure/redis/plant-species-redis.client';
 import { PlantSpeciesCommonNameTypeOrmEntity } from './infrastructure/persistence/typeorm/entities/plant-species-common-name.entity';
 import { PlantSpeciesExternalIdTypeOrmEntity } from './infrastructure/persistence/typeorm/entities/plant-species-external-id.entity';
@@ -38,10 +31,8 @@ import { PlantSpeciesTypeOrmReadRepository } from './infrastructure/persistence/
 import { PlantSpeciesTypeOrmWriteRepository } from './infrastructure/persistence/typeorm/repositories/plant-species-typeorm-write.repository';
 import { PlantSpeciesCreateMcpTool } from './transport/mcp/tools/plant-species-create.tool';
 import { PlantSpeciesDeleteMcpTool } from './transport/mcp/tools/plant-species-delete.tool';
-import { PlantSpeciesEnrichMcpTool } from './transport/mcp/tools/plant-species-enrich.tool';
 import { PlantSpeciesFindByCriteriaMcpTool } from './transport/mcp/tools/plant-species-find-by-criteria.tool';
 import { PlantSpeciesFindByIdMcpTool } from './transport/mcp/tools/plant-species-find-by-id.tool';
-import { PlantSpeciesImportMcpTool } from './transport/mcp/tools/plant-species-import.tool';
 import { PlantSpeciesIngestMcpTool } from './transport/mcp/tools/plant-species-ingest.tool';
 import { PlantSpeciesUpdateMcpTool } from './transport/mcp/tools/plant-species-update.tool';
 import { PlantSpeciesGraphQLMapper } from './transport/graphql/mappers/plant-species.mapper';
@@ -54,8 +45,6 @@ const COMMAND_HANDLERS = [
   CreatePlantSpeciesCommandHandler,
   UpdatePlantSpeciesCommandHandler,
   DeletePlantSpeciesCommandHandler,
-  EnrichPlantSpeciesCommandHandler,
-  ImportPlantSpeciesCommandHandler,
   IngestPlantSpeciesCommandHandler,
 ];
 
@@ -93,14 +82,6 @@ const INFRASTRUCTURE_ADAPTERS = [
     useClass: PlantSpeciesReferenceAdapter,
   },
   {
-    provide: PLANT_SPECIES_IMPORT_PORT,
-    useClass: GbifPlantSpeciesImportAdapter,
-  },
-  {
-    provide: PLANT_SPECIES_WIKIDATA_PORT,
-    useClass: WikidataPlantSpeciesAdapter,
-  },
-  {
     provide: PLANT_SPECIES_QUEUE_PORT,
     useClass: RedisPlantSpeciesQueueAdapter,
   },
@@ -119,8 +100,6 @@ const MCP_TOOLS = [
   PlantSpeciesCreateMcpTool,
   PlantSpeciesUpdateMcpTool,
   PlantSpeciesDeleteMcpTool,
-  PlantSpeciesEnrichMcpTool,
-  PlantSpeciesImportMcpTool,
   PlantSpeciesIngestMcpTool,
   PlantSpeciesFindByIdMcpTool,
   PlantSpeciesFindByCriteriaMcpTool,
@@ -129,7 +108,6 @@ const MCP_TOOLS = [
 @Module({
   imports: [
     CqrsModule,
-    HttpModule,
     TypeOrmModule.forFeature([
       PlantSpeciesTypeOrmEntity,
       PlantSpeciesCommonNameTypeOrmEntity,

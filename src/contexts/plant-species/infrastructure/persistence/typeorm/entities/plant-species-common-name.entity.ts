@@ -31,7 +31,4 @@ export class PlantSpeciesCommonNameTypeOrmEntity {
 
   @Column({ type: 'varchar', length: 16, nullable: true })
   language!: string | null;
-
-  @Column({ type: 'varchar', length: 32 })
-  source!: string;
 }

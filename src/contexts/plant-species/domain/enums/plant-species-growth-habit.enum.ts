@@ -1,7 +1,6 @@
 /**
- * Coarse growth form of a plant species, as exposed by Wikidata's "plant growth
- * habit" (P3485) and similar statements. Kept intentionally coarse so it maps
- * cleanly from heterogeneous external vocabularies.
+ * Coarse growth form of a plant species. Kept intentionally coarse so it maps
+ * cleanly from heterogeneous source vocabularies (set by the worker).
  */
 export enum PlantSpeciesGrowthHabitEnum {
   TREE = 'TREE',

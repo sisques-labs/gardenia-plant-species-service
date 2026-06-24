@@ -7,8 +7,6 @@ import { PlantSpeciesNotFoundException } from '@contexts/plant-species/domain/ex
 import { IPlantSpeciesWriteRepository } from '@contexts/plant-species/domain/repositories/write/plant-species-write.repository';
 import { PlantSpeciesIdValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-id/plant-species-id.value-object';
 import { PlantSpeciesScientificNameValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-scientific-name/plant-species-scientific-name.value-object';
-import { PlantSpeciesSourceValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-source/plant-species-source.value-object';
-import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 import { AssertPlantSpeciesExistsService } from '@contexts/plant-species/application/services/write/assert-plant-species-exists/assert-plant-species-exists.service';
 import { AssertPlantSpeciesNameAvailableService } from '@contexts/plant-species/application/services/write/assert-plant-species-name-available/assert-plant-species-name-available.service';
 
@@ -28,8 +26,6 @@ const buildAggregate = (): PlantSpeciesAggregate =>
     authorship: null,
     growthHabit: null,
     wikipediaUrl: null,
-    source: new PlantSpeciesSourceValueObject(PlantSpeciesSourceEnum.MANUAL),
-    lastEnrichedAt: null,
     commonNames: [],
     images: [],
     externalIds: [],

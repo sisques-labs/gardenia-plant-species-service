@@ -29,9 +29,6 @@ export class PlantSpeciesImageTypeOrmEntity {
   @Column({ type: 'varchar', length: 500 })
   url!: string;
 
-  @Column({ type: 'varchar', length: 32 })
-  source!: string;
-
   @Column({ name: 'is_primary', type: 'boolean', default: false })
   isPrimary!: boolean;
 }

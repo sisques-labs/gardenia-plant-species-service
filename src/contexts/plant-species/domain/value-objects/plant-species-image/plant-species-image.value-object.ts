@@ -1,6 +1,5 @@
 import { ValueObject } from '@sisques-labs/nestjs-kit';
 
-import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
 
 export class PlantSpeciesImageValueObject extends ValueObject<IPlantSpeciesImage> {
@@ -12,7 +11,6 @@ export class PlantSpeciesImageValueObject extends ValueObject<IPlantSpeciesImage
     super();
     this._value = {
       url: value.url.trim(),
-      source: value.source,
       isPrimary: value.isPrimary,
     };
     this.validate();
@@ -29,11 +27,6 @@ export class PlantSpeciesImageValueObject extends ValueObject<IPlantSpeciesImage
     if (this._value.url.length > PlantSpeciesImageValueObject.MAX_URL_LENGTH) {
       throw new Error(
         `Plant species image URL exceeds ${PlantSpeciesImageValueObject.MAX_URL_LENGTH} characters`,
-      );
-    }
-    if (!Object.values(PlantSpeciesSourceEnum).includes(this._value.source)) {
-      throw new Error(
-        `Invalid plant species image source: ${this._value.source}`,
       );
     }
   }

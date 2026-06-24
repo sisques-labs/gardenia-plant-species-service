@@ -1,9 +1,7 @@
 import { BasePaginatedResultDto } from '@sisques-labs/nestjs-kit';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 
-import { PlantSpeciesExternalIdSchemeEnum } from '@contexts/plant-species/domain/enums/plant-species-external-id-scheme.enum';
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { PlantSpeciesSourceEnum } from '@contexts/plant-species/domain/enums/plant-species-source.enum';
 
 @ObjectType('PlantSpeciesClassificationDto')
 export class PlantSpeciesClassificationDto {
@@ -48,9 +46,6 @@ export class PlantSpeciesCommonNameDto {
 
   @Field(() => String, { nullable: true })
   language!: string | null;
-
-  @Field(() => PlantSpeciesSourceEnum)
-  source!: PlantSpeciesSourceEnum;
 }
 
 @ObjectType('PlantSpeciesImageDto')
@@ -58,17 +53,14 @@ export class PlantSpeciesImageDto {
   @Field(() => String)
   url!: string;
 
-  @Field(() => PlantSpeciesSourceEnum)
-  source!: PlantSpeciesSourceEnum;
-
   @Field(() => Boolean)
   isPrimary!: boolean;
 }
 
 @ObjectType('PlantSpeciesExternalIdDto')
 export class PlantSpeciesExternalIdDto {
-  @Field(() => PlantSpeciesExternalIdSchemeEnum)
-  scheme!: PlantSpeciesExternalIdSchemeEnum;
+  @Field(() => String)
+  scheme!: string;
 
   @Field(() => String)
   value!: string;
@@ -119,17 +111,6 @@ export class PlantSpeciesResponseDto {
     description: 'Wikipedia article URL',
   })
   wikipediaUrl!: string | null;
-
-  @Field(() => PlantSpeciesSourceEnum, {
-    description: 'Where this record originated',
-  })
-  source!: PlantSpeciesSourceEnum;
-
-  @Field(() => Date, {
-    nullable: true,
-    description: 'When the record was last enriched from external sources',
-  })
-  lastEnrichedAt!: Date | null;
 
   @Field(() => [PlantSpeciesCommonNameDto], {
     description: 'Vernacular (common) names',
