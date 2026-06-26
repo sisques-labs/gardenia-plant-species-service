@@ -9,9 +9,9 @@ shared transport and discovery wiring.
 - **SDK**: official `@modelcontextprotocol/sdk` (`McpServer` + `StreamableHTTPServerTransport`).
 - **Transport**: Streamable HTTP, **stateless** (a fresh server per request).
 - **Endpoint**: `POST /api/mcp` (`GET`/`DELETE` return `405` — no sessions).
-- **Auth/tenancy**: reuses the global `OptionalJwtAuthGuard` + `SpaceGuard` +
-  `SpaceInterceptor`. Every request **MUST** send `Authorization: Bearer <jwt>`
-  and `X-Space-ID: <spaceId>`, exactly like the rest of the API.
+- **Auth/tenancy**: none. This service is a lean, single-tenant microservice
+  with no authentication or spaces, so the per-request `IMcpToolContext` is
+  currently empty.
 - **Layer**: tools live in each context's `transport/mcp/` — they are inbound
   protocol adapters (like resolvers/controllers) and only dispatch through the
   Command/Query bus.
@@ -20,29 +20,25 @@ shared transport and discovery wiring.
 
 ```
 POST /api/mcp
-  → OptionalJwtAuthGuard (sets req.user)
-  → SpaceGuard           (validates X-Space-ID, sets req.spaceId)
-  → SpaceInterceptor     (wraps handler in tenant ALS frame)
   → McpController
-      → McpServerFactory.create({ userId, email, spaceId })   // per request
+      → McpServerFactory.create({})                 // per request, empty context
           → registers every discovered IMcpTool on a new McpServer
       → StreamableHTTPServerTransport.handleRequest(req, res, body)
           → tool.execute(args, context)
-              → CommandBus / QueryBus.execute(...)   // resolves within the space
+              → CommandBus / QueryBus.execute(...)
 ```
 
-Because the server is built per request and tool handlers close over the
-request's `IMcpToolContext`, multi-tenancy isolation is strict: a request can
-only act as its authenticated user inside its own space. Tenant repositories
-keep reading the space id from `SpaceContext` (ALS), so no tool wiring is needed
-for tenancy.
+The server is built per request and kept stateless: no session id is generated
+and `GET`/`DELETE` (the SSE stream and session-termination verbs from the spec)
+return `405`. Tools are request/response only, so the transport replies with a
+single `application/json` JSON-RPC response.
 
 ## Building blocks
 
 | File | Responsibility |
 |------|----------------|
 | `interfaces/mcp-tool.interface.ts` | `IMcpTool` contract every tool implements |
-| `interfaces/mcp-tool-context.interface.ts` | per-request auth/tenancy context |
+| `interfaces/mcp-tool-context.interface.ts` | per-request context (currently empty) |
 | `decorators/mcp-tool.decorator.ts` | `@McpTool()` — marks a provider for discovery |
 | `services/mcp-tool-registry.service.ts` | discovers tagged tools at bootstrap |
 | `services/mcp-server.factory.ts` | builds a per-request `McpServer` |
@@ -72,37 +68,30 @@ for tenancy.
 
      readonly name = 'foo_create';
      readonly title = 'Create foo';
-     readonly description = 'Creates a foo in the current space.';
+     readonly description = 'Creates a foo in the shared catalog.';
      readonly inputSchema = fooCreateSchema;
 
      constructor(private readonly commandBus: CommandBus) {}
 
-     async execute(
-       args: Record<string, unknown>,
-       context: IMcpToolContext,
-     ): Promise<CallToolResult> {
+     async execute(args: Record<string, unknown>): Promise<CallToolResult> {
        const { name } = args as { name: string };
-       this.logger.log(`Creating foo for user: ${context.userId}`);
-       const id = await this.commandBus.execute(
-         new CreateFooCommand({ name, userId: context.userId }),
-       );
+       this.logger.log(`Creating foo: ${name}`);
+       const id = await this.commandBus.execute(new CreateFooCommand({ name }));
        return { content: [{ type: 'text', text: JSON.stringify({ id }) }] };
      }
    }
    ```
 
-3. Register the tool classes in the module via an `MCP_TOOLS` array and spread it
-   into `providers` (the `@McpTool()` metadata makes them discoverable globally —
-   no need to export them).
+3. Register the tool classes in the context module's `TRANSPORT_PROVIDERS` array
+   and spread it into `providers` (the `@McpTool()` metadata makes them
+   discoverable globally — no need to export them).
 
 ### Conventions
 
 - **Schemas** — each tool's Zod `inputSchema` lives in its own file under
   `transport/mcp/schemas/`, never inline in the tool.
 - **Bus only** — tools dispatch Commands/Queries, never inject services/repos.
-- **Naming** — `snake_case` tool names, prefixed by the entity (`plant_create`).
-- **Auth** — read the acting user from the injected `IMcpToolContext.userId`;
-  never trust an id passed in `args` for ownership.
+- **Naming** — `snake_case` tool names, prefixed by the entity (`plant_species_create`).
 - **Logging** — log at entry (transport rule), like resolvers/controllers.
 - **Input** — describe every field with `.describe(...)` so the AI client has
   good schemas.
@@ -117,33 +106,25 @@ untouched and resolved by Node at runtime via the `exports` map.
 
 ## Wired contexts
 
-Every bounded context exposes its queries and commands as tools under
-`transport/mcp/` (see `src/contexts/plants/transport/mcp/` as the reference):
-
 | Context | Tools |
 |---------|-------|
-| plants | find by id/criteria, create, update, delete |
-| care-log | create, update, delete, find by criteria, find last by type |
-| harvests | create, update, delete, find by id/criteria |
-| inventory | create, update, adjust quantity, delete, find by id/criteria |
-| plant-species | create, update, delete, enrich, import, find by id/criteria |
-| planting-spots | create, update, delete, find by id/criteria |
-| qr | create, regenerate, delete, find by id |
-| spaces | create, update, add/remove member, create/accept invitation, find by id, list mine, weather |
-| users | update (self), find by id/criteria |
-| weather | get forecast |
-
-**Not exposed:** the `auth` context. Its commands are credential/session flows
-(login, register, OAuth, refresh-token, logout, change/delete-account) that are
-unsafe or meaningless as AI tools, and its queries read account/PII data.
-Exposing it would need an explicit, separate decision.
+| plant-species | create, update, delete, ingest, find by id, find by criteria |
 
 ## Cursor IDE setup
 
 1. Start the API locally (`pnpm start:dev`).
-2. Copy `.cursor/mcp.json.example` to `.cursor/mcp.json`.
-3. Replace `<jwt>` with a valid access token (e.g. from `POST /api/auth/login`).
-4. Replace `<space-id>` with the space you want the agent to act in.
+2. Add an MCP server entry to `.cursor/mcp.json` pointing at the local endpoint
+   (no auth headers are required):
 
-Cursor loads project MCP servers from `.cursor/mcp.json` (gitignored — never
-commit real tokens). Restart Cursor or reload MCP servers after editing the file.
+   ```json
+   {
+     "mcpServers": {
+       "gardenia-plant-species": {
+         "url": "http://localhost:3000/api/mcp"
+       }
+     }
+   }
+   ```
+
+Cursor loads project MCP servers from `.cursor/mcp.json`. Restart Cursor or
+reload MCP servers after editing the file.
