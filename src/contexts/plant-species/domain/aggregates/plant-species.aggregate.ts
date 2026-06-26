@@ -1,9 +1,16 @@
 import { BaseAggregate } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
+import { PlantSpeciesAuthorshipChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-authorship-changed/plant-species-authorship-changed.event';
+import { PlantSpeciesClassificationChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-classification-changed/plant-species-classification-changed.event';
+import { PlantSpeciesCommonNamesChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-common-names-changed/plant-species-common-names-changed.event';
 import { PlantSpeciesDescriptionChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-description-changed/plant-species-description-changed.event';
+import { PlantSpeciesExternalIdsChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-external-ids-changed/plant-species-external-ids-changed.event';
+import { PlantSpeciesGrowthHabitChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-growth-habit-changed/plant-species-growth-habit-changed.event';
 import { PlantSpeciesImageUrlChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-image-url-changed/plant-species-image-url-changed.event';
+import { PlantSpeciesImagesChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-images-changed/plant-species-images-changed.event';
 import { PlantSpeciesScientificNameChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-scientific-name-changed/plant-species-scientific-name-changed.event';
+import { PlantSpeciesWikipediaUrlChangedEvent } from '@contexts/plant-species/domain/events/field-changed/plant-species-wikipedia-url-changed/plant-species-wikipedia-url-changed.event';
 import { PlantSpeciesCreatedEvent } from '@contexts/plant-species/domain/events/plant-species-created/plant-species-created.event';
 import { PlantSpeciesDeletedEvent } from '@contexts/plant-species/domain/events/plant-species-deleted/plant-species-deleted.event';
 import { PlantSpeciesUpdatedEvent } from '@contexts/plant-species/domain/events/plant-species-updated/plant-species-updated.event';
@@ -88,42 +95,32 @@ export class PlantSpeciesAggregate extends BaseAggregate {
       this.changeImageUrl(props.imageUrl);
     }
 
-    // Taxonomy / external-source fields are replaced wholesale (like at
-    // construction): they carry no per-field "changed" events — the catch-all
-    // PlantSpeciesUpdatedEvent below records the new state.
     if (props.classification !== undefined) {
-      this._classification = props.classification;
-      this.touch();
+      this.changeClassification(props.classification);
     }
 
     if (props.authorship !== undefined) {
-      this._authorship = props.authorship;
-      this.touch();
+      this.changeAuthorship(props.authorship);
     }
 
     if (props.growthHabit !== undefined) {
-      this._growthHabit = props.growthHabit;
-      this.touch();
+      this.changeGrowthHabit(props.growthHabit);
     }
 
     if (props.wikipediaUrl !== undefined) {
-      this._wikipediaUrl = props.wikipediaUrl;
-      this.touch();
+      this.changeWikipediaUrl(props.wikipediaUrl);
     }
 
     if (props.commonNames !== undefined) {
-      this._commonNames = props.commonNames;
-      this.touch();
+      this.changeCommonNames(props.commonNames);
     }
 
     if (props.images !== undefined) {
-      this._images = props.images;
-      this.touch();
+      this.changeImages(props.images);
     }
 
     if (props.externalIds !== undefined) {
-      this._externalIds = props.externalIds;
-      this.touch();
+      this.changeExternalIds(props.externalIds);
     }
 
     this.apply(
@@ -209,6 +206,181 @@ export class PlantSpeciesAggregate extends BaseAggregate {
           entityId: this._id.value,
           entityType: PlantSpeciesAggregate.name,
           eventType: PlantSpeciesImageUrlChangedEvent.name,
+        },
+        { id: this._id.value, oldValue, newValue },
+      ),
+    );
+  }
+
+  private changeClassification(
+    newClassification: PlantSpeciesClassificationValueObject | null,
+  ): void {
+    const oldValue = this._classification?.value ?? null;
+    const newValue = newClassification?.value ?? null;
+
+    if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return;
+
+    this._classification = newClassification;
+    this.touch();
+
+    this.apply(
+      new PlantSpeciesClassificationChangedEvent(
+        {
+          aggregateRootId: this._id.value,
+          aggregateRootType: PlantSpeciesAggregate.name,
+          entityId: this._id.value,
+          entityType: PlantSpeciesAggregate.name,
+          eventType: PlantSpeciesClassificationChangedEvent.name,
+        },
+        { id: this._id.value, oldValue, newValue },
+      ),
+    );
+  }
+
+  private changeAuthorship(
+    newAuthorship: PlantSpeciesAuthorshipValueObject | null,
+  ): void {
+    const oldValue = this._authorship?.value ?? null;
+    const newValue = newAuthorship?.value ?? null;
+
+    if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return;
+
+    this._authorship = newAuthorship;
+    this.touch();
+
+    this.apply(
+      new PlantSpeciesAuthorshipChangedEvent(
+        {
+          aggregateRootId: this._id.value,
+          aggregateRootType: PlantSpeciesAggregate.name,
+          entityId: this._id.value,
+          entityType: PlantSpeciesAggregate.name,
+          eventType: PlantSpeciesAuthorshipChangedEvent.name,
+        },
+        { id: this._id.value, oldValue, newValue },
+      ),
+    );
+  }
+
+  private changeGrowthHabit(
+    newGrowthHabit: PlantSpeciesGrowthHabitValueObject | null,
+  ): void {
+    const oldValue =
+      (this._growthHabit?.value as PlantSpeciesGrowthHabitEnum) ?? null;
+    const newValue =
+      (newGrowthHabit?.value as PlantSpeciesGrowthHabitEnum) ?? null;
+
+    if (oldValue === newValue) return;
+
+    this._growthHabit = newGrowthHabit;
+    this.touch();
+
+    this.apply(
+      new PlantSpeciesGrowthHabitChangedEvent(
+        {
+          aggregateRootId: this._id.value,
+          aggregateRootType: PlantSpeciesAggregate.name,
+          entityId: this._id.value,
+          entityType: PlantSpeciesAggregate.name,
+          eventType: PlantSpeciesGrowthHabitChangedEvent.name,
+        },
+        { id: this._id.value, oldValue, newValue },
+      ),
+    );
+  }
+
+  private changeWikipediaUrl(
+    newWikipediaUrl: PlantSpeciesWikipediaUrlValueObject | null,
+  ): void {
+    const oldValue = this._wikipediaUrl?.value ?? null;
+    const newValue = newWikipediaUrl?.value ?? null;
+
+    if (oldValue === newValue) return;
+
+    this._wikipediaUrl = newWikipediaUrl;
+    this.touch();
+
+    this.apply(
+      new PlantSpeciesWikipediaUrlChangedEvent(
+        {
+          aggregateRootId: this._id.value,
+          aggregateRootType: PlantSpeciesAggregate.name,
+          entityId: this._id.value,
+          entityType: PlantSpeciesAggregate.name,
+          eventType: PlantSpeciesWikipediaUrlChangedEvent.name,
+        },
+        { id: this._id.value, oldValue, newValue },
+      ),
+    );
+  }
+
+  private changeCommonNames(
+    newCommonNames: PlantSpeciesCommonNameValueObject[],
+  ): void {
+    const oldValue = this._commonNames.map((name) => name.value);
+    const newValue = newCommonNames.map((name) => name.value);
+
+    if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return;
+
+    this._commonNames = newCommonNames;
+    this.touch();
+
+    this.apply(
+      new PlantSpeciesCommonNamesChangedEvent(
+        {
+          aggregateRootId: this._id.value,
+          aggregateRootType: PlantSpeciesAggregate.name,
+          entityId: this._id.value,
+          entityType: PlantSpeciesAggregate.name,
+          eventType: PlantSpeciesCommonNamesChangedEvent.name,
+        },
+        { id: this._id.value, oldValue, newValue },
+      ),
+    );
+  }
+
+  private changeImages(newImages: PlantSpeciesImageValueObject[]): void {
+    const oldValue = this._images.map((image) => image.value);
+    const newValue = newImages.map((image) => image.value);
+
+    if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return;
+
+    this._images = newImages;
+    this.touch();
+
+    this.apply(
+      new PlantSpeciesImagesChangedEvent(
+        {
+          aggregateRootId: this._id.value,
+          aggregateRootType: PlantSpeciesAggregate.name,
+          entityId: this._id.value,
+          entityType: PlantSpeciesAggregate.name,
+          eventType: PlantSpeciesImagesChangedEvent.name,
+        },
+        { id: this._id.value, oldValue, newValue },
+      ),
+    );
+  }
+
+  private changeExternalIds(
+    newExternalIds: PlantSpeciesExternalIdValueObject[],
+  ): void {
+    const oldValue = this._externalIds.map((externalId) => externalId.value);
+    const newValue = newExternalIds.map((externalId) => externalId.value);
+
+    if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return;
+
+    this._externalIds = newExternalIds;
+    this.touch();
+
+    this.apply(
+      new PlantSpeciesExternalIdsChangedEvent(
+        {
+          aggregateRootId: this._id.value,
+          aggregateRootType: PlantSpeciesAggregate.name,
+          entityId: this._id.value,
+          entityType: PlantSpeciesAggregate.name,
+          eventType: PlantSpeciesExternalIdsChangedEvent.name,
         },
         { id: this._id.value, oldValue, newValue },
       ),
