@@ -1,41 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-
-export class PlantSpeciesClassificationRestDto {
-  @ApiPropertyOptional({ nullable: true }) kingdom!: string | null;
-  @ApiPropertyOptional({ nullable: true }) phylum!: string | null;
-  @ApiPropertyOptional({ nullable: true }) class!: string | null;
-  @ApiPropertyOptional({ nullable: true }) order!: string | null;
-  @ApiPropertyOptional({ nullable: true }) family!: string | null;
-  @ApiPropertyOptional({ nullable: true }) genus!: string | null;
-  @ApiPropertyOptional({ nullable: true }) specificEpithet!: string | null;
-  @ApiPropertyOptional({ nullable: true }) rank!: string | null;
-}
-
-export class PlantSpeciesAuthorshipRestDto {
-  @ApiPropertyOptional({ nullable: true, example: 'L.' })
-  author!: string | null;
-
-  @ApiPropertyOptional({ nullable: true, example: 1753 })
-  year!: number | null;
-}
-
-export class PlantSpeciesCommonNameRestDto {
-  @ApiProperty({ example: 'Dog rose' }) name!: string;
-  @ApiPropertyOptional({ nullable: true, example: 'en' })
-  language!: string | null;
-}
-
-export class PlantSpeciesImageRestDto {
-  @ApiProperty({ example: 'https://example.com/rosa.jpg' }) url!: string;
-  @ApiProperty({ example: true }) isPrimary!: boolean;
-}
-
-export class PlantSpeciesExternalIdRestDto {
-  @ApiProperty({ example: 'GBIF' }) scheme!: string;
-  @ApiProperty({ example: '2705959' }) value!: string;
-}
+import { PlantSpeciesAuthorshipRestDto } from '@contexts/plant-species/transport/rest/dtos/plant-species-authorship-rest.dto';
+import { PlantSpeciesClassificationRestDto } from '@contexts/plant-species/transport/rest/dtos/plant-species-classification-rest.dto';
+import { PlantSpeciesCommonNameRestDto } from '@contexts/plant-species/transport/rest/dtos/plant-species-common-name-rest.dto';
+import { PlantSpeciesExternalIdRestDto } from '@contexts/plant-species/transport/rest/dtos/plant-species-external-id-rest.dto';
+import { PlantSpeciesImageRestDto } from '@contexts/plant-species/transport/rest/dtos/plant-species-image-rest.dto';
 
 export class PlantSpeciesRestResponseDto {
   @ApiProperty({

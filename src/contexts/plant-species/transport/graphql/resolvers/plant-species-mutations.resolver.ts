@@ -9,7 +9,7 @@ import {
 import { CreatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/create-plant-species/create-plant-species.command';
 import { DeletePlantSpeciesCommand } from '@contexts/plant-species/application/commands/delete-plant-species/delete-plant-species.command';
 import { IngestPlantSpeciesCommand } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.command';
-import { IngestPlantSpeciesResult } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.handler';
+import { IngestPlantSpeciesResult } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.result';
 import { UpdatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/update-plant-species/update-plant-species.command';
 
 import { PlantSpeciesCreateRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-create.request.dto';

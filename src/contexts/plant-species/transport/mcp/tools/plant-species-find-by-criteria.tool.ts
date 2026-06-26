@@ -6,7 +6,7 @@ import { Criteria } from '@sisques-labs/nestjs-kit';
 import { McpTool } from '@core/mcp/decorators/mcp-tool.decorator';
 import { IMcpTool } from '@core/mcp/interfaces/mcp-tool.interface';
 import { PlantSpeciesFindByCriteriaQuery } from '@contexts/plant-species/application/queries/plant-species-find-by-criteria/plant-species-find-by-criteria.query';
-import { plantSpeciesFindByCriteriaSchema } from '../schemas/plant-species-find-by-criteria.schema';
+import { plantSpeciesFindByCriteriaSchema } from '@contexts/plant-species/transport/mcp/schemas/plant-species-find-by-criteria.schema';
 
 @McpTool()
 @Injectable()

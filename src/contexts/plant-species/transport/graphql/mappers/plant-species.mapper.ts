@@ -1,24 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PaginatedResult } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesViewModel } from '@contexts/plant-species/domain/view-models/plant-species.view-model';
 
-import {
-  PaginatedPlantSpeciesResultDto,
-  PlantSpeciesResponseDto,
-} from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species.response.dto';
+import { PaginatedPlantSpeciesResultDto } from '@contexts/plant-species/transport/graphql/dtos/responses/paginated-plant-species-result.dto';
+import { PlantSpeciesResponseDto } from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species.response.dto';
 
 @Injectable()
 export class PlantSpeciesGraphQLMapper {
-  private readonly logger = new Logger(PlantSpeciesGraphQLMapper.name);
-
   toResponseDtoFromViewModel(
     vm: PlantSpeciesViewModel,
   ): PlantSpeciesResponseDto {
-    this.logger.log(
-      `Mapping plant species view model to response dto: ${vm.id}`,
-    );
-
     return {
       id: vm.id,
       scientificName: vm.scientificName,

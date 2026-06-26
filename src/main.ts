@@ -38,7 +38,7 @@ async function bootstrap() {
     .getOrThrow<string[]>('app.corsOrigins');
   app.enableCors({ origin: corsOrigins, credentials: true });
 
-  const port = process.env.PORT ?? 3001;
+  const port = process.env.PORT ?? 3000;
   await app.listen(port);
   console.log(
     `Gardenia Plant Species Service listening on http://localhost:${port}/api`,

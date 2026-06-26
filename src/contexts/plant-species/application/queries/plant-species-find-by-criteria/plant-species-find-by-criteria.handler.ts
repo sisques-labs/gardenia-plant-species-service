@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PaginatedResult } from '@sisques-labs/nestjs-kit';
 
@@ -11,6 +11,10 @@ import { PlantSpeciesViewModel } from '@contexts/plant-species/domain/view-model
 
 @QueryHandler(PlantSpeciesFindByCriteriaQuery)
 export class PlantSpeciesFindByCriteriaQueryHandler implements IQueryHandler<PlantSpeciesFindByCriteriaQuery> {
+  private readonly logger = new Logger(
+    PlantSpeciesFindByCriteriaQueryHandler.name,
+  );
+
   constructor(
     @Inject(PLANT_SPECIES_READ_REPOSITORY)
     private readonly plantSpeciesReadRepository: IPlantSpeciesReadRepository,
@@ -19,6 +23,8 @@ export class PlantSpeciesFindByCriteriaQueryHandler implements IQueryHandler<Pla
   async execute(
     query: PlantSpeciesFindByCriteriaQuery,
   ): Promise<PaginatedResult<PlantSpeciesViewModel>> {
+    this.logger.log('Finding plant species by criteria');
+
     return await this.plantSpeciesReadRepository.findByCriteria(query.criteria);
   }
 }

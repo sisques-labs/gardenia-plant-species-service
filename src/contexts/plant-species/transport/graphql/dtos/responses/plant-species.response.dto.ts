@@ -1,70 +1,11 @@
-import { BasePaginatedResultDto } from '@sisques-labs/nestjs-kit';
-import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-
-@ObjectType('PlantSpeciesClassificationDto')
-export class PlantSpeciesClassificationDto {
-  @Field(() => String, { nullable: true })
-  kingdom!: string | null;
-
-  @Field(() => String, { nullable: true })
-  phylum!: string | null;
-
-  @Field(() => String, { nullable: true })
-  class!: string | null;
-
-  @Field(() => String, { nullable: true })
-  order!: string | null;
-
-  @Field(() => String, { nullable: true })
-  family!: string | null;
-
-  @Field(() => String, { nullable: true })
-  genus!: string | null;
-
-  @Field(() => String, { nullable: true })
-  specificEpithet!: string | null;
-
-  @Field(() => String, { nullable: true })
-  rank!: string | null;
-}
-
-@ObjectType('PlantSpeciesAuthorshipDto')
-export class PlantSpeciesAuthorshipDto {
-  @Field(() => String, { nullable: true })
-  author!: string | null;
-
-  @Field(() => Int, { nullable: true })
-  year!: number | null;
-}
-
-@ObjectType('PlantSpeciesCommonNameDto')
-export class PlantSpeciesCommonNameDto {
-  @Field(() => String)
-  name!: string;
-
-  @Field(() => String, { nullable: true })
-  language!: string | null;
-}
-
-@ObjectType('PlantSpeciesImageDto')
-export class PlantSpeciesImageDto {
-  @Field(() => String)
-  url!: string;
-
-  @Field(() => Boolean)
-  isPrimary!: boolean;
-}
-
-@ObjectType('PlantSpeciesExternalIdDto')
-export class PlantSpeciesExternalIdDto {
-  @Field(() => String)
-  scheme!: string;
-
-  @Field(() => String)
-  value!: string;
-}
+import { PlantSpeciesAuthorshipDto } from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species-authorship.dto';
+import { PlantSpeciesClassificationDto } from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species-classification.dto';
+import { PlantSpeciesCommonNameDto } from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species-common-name.dto';
+import { PlantSpeciesExternalIdDto } from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species-external-id.dto';
+import { PlantSpeciesImageDto } from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species-image.dto';
 
 @ObjectType('PlantSpeciesResponseDto')
 export class PlantSpeciesResponseDto {
@@ -130,12 +71,4 @@ export class PlantSpeciesResponseDto {
 
   @Field(() => Date, { description: 'When the catalog entry was last updated' })
   updatedAt!: Date;
-}
-
-@ObjectType('PaginatedPlantSpeciesResultDto')
-export class PaginatedPlantSpeciesResultDto extends BasePaginatedResultDto {
-  @Field(() => [PlantSpeciesResponseDto], {
-    description: 'The plant species entries in the current page',
-  })
-  items!: PlantSpeciesResponseDto[];
 }

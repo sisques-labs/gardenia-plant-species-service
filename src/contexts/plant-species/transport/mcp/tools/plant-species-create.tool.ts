@@ -5,7 +5,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { McpTool } from '@core/mcp/decorators/mcp-tool.decorator';
 import { IMcpTool } from '@core/mcp/interfaces/mcp-tool.interface';
 import { CreatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/create-plant-species/create-plant-species.command';
-import { plantSpeciesCreateSchema } from '../schemas/plant-species-create.schema';
+import { plantSpeciesCreateSchema } from '@contexts/plant-species/transport/mcp/schemas/plant-species-create.schema';
 
 @McpTool()
 @Injectable()

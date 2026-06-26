@@ -17,7 +17,9 @@ import { resolvePlantSpeciesExceptionStatus } from '@contexts/plant-species/tran
  * folder; wire them into `resolveStatus` as contexts are added.
  */
 @Catch(BaseException)
-export class BaseExceptionFilter implements ExceptionFilter, GqlExceptionFilter {
+export class BaseExceptionFilter
+  implements ExceptionFilter, GqlExceptionFilter
+{
   catch(exception: BaseException, host: ArgumentsHost): void {
     const status = this.resolveStatus(exception);
 

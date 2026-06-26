@@ -7,10 +7,7 @@ import {
 } from '@contexts/plant-species/application/ports/plant-species-queue.port';
 
 import { IngestPlantSpeciesCommand } from './ingest-plant-species.command';
-
-export type IngestPlantSpeciesResult = {
-  accepted: number;
-};
+import { IngestPlantSpeciesResult } from './ingest-plant-species.result';
 
 @CommandHandler(IngestPlantSpeciesCommand)
 export class IngestPlantSpeciesCommandHandler implements ICommandHandler<

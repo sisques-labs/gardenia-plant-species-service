@@ -8,10 +8,8 @@ import { PlantSpeciesFindByIdQuery } from '@contexts/plant-species/application/q
 
 import { PlantSpeciesFindByCriteriaRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-find-by-criteria.request.dto';
 import { PlantSpeciesFindByIdRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-find-by-id.request.dto';
-import {
-  PaginatedPlantSpeciesResultDto,
-  PlantSpeciesResponseDto,
-} from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species.response.dto';
+import { PaginatedPlantSpeciesResultDto } from '@contexts/plant-species/transport/graphql/dtos/responses/paginated-plant-species-result.dto';
+import { PlantSpeciesResponseDto } from '@contexts/plant-species/transport/graphql/dtos/responses/plant-species.response.dto';
 import { PlantSpeciesGraphQLMapper } from '@contexts/plant-species/transport/graphql/mappers/plant-species.mapper';
 
 @Resolver()

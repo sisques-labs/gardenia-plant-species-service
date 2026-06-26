@@ -62,6 +62,13 @@ const APPLICATION_SERVICES = [
 
 const DOMAIN_BUILDERS = [PlantSpeciesBuilder];
 
+const INFRASTRUCTURE_ENTITIES = [
+  PlantSpeciesTypeOrmEntity,
+  PlantSpeciesCommonNameTypeOrmEntity,
+  PlantSpeciesImageTypeOrmEntity,
+  PlantSpeciesExternalIdTypeOrmEntity,
+];
+
 const INFRASTRUCTURE_MAPPERS = [PlantSpeciesTypeOrmMapper];
 
 const INFRASTRUCTURE_REPOSITORIES = [
@@ -88,15 +95,12 @@ const INFRASTRUCTURE_ADAPTERS = [
 ];
 
 const REST_CONTROLLERS = [PlantSpeciesController];
-const REST_PROVIDERS = [PlantSpeciesRestMapper];
 
-const GRAPHQL_PROVIDERS = [
+const TRANSPORT_PROVIDERS = [
+  PlantSpeciesRestMapper,
   PlantSpeciesQueriesResolver,
   PlantSpeciesMutationsResolver,
   PlantSpeciesGraphQLMapper,
-];
-
-const MCP_TOOLS = [
   PlantSpeciesCreateMcpTool,
   PlantSpeciesUpdateMcpTool,
   PlantSpeciesDeleteMcpTool,
@@ -106,15 +110,7 @@ const MCP_TOOLS = [
 ];
 
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([
-      PlantSpeciesTypeOrmEntity,
-      PlantSpeciesCommonNameTypeOrmEntity,
-      PlantSpeciesImageTypeOrmEntity,
-      PlantSpeciesExternalIdTypeOrmEntity,
-    ]),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature(INFRASTRUCTURE_ENTITIES)],
   controllers: [...REST_CONTROLLERS],
   providers: [
     ...COMMAND_HANDLERS,
@@ -124,9 +120,7 @@ const MCP_TOOLS = [
     ...INFRASTRUCTURE_MAPPERS,
     ...INFRASTRUCTURE_REPOSITORIES,
     ...INFRASTRUCTURE_ADAPTERS,
-    ...REST_PROVIDERS,
-    ...GRAPHQL_PROVIDERS,
-    ...MCP_TOOLS,
+    ...TRANSPORT_PROVIDERS,
   ],
   exports: [],
 })

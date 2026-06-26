@@ -5,7 +5,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { McpTool } from '@core/mcp/decorators/mcp-tool.decorator';
 import { IMcpTool } from '@core/mcp/interfaces/mcp-tool.interface';
 import { PlantSpeciesFindByIdQuery } from '@contexts/plant-species/application/queries/plant-species-find-by-id/plant-species-find-by-id.query';
-import { plantSpeciesFindByIdSchema } from '../schemas/plant-species-find-by-id.schema';
+import { plantSpeciesFindByIdSchema } from '@contexts/plant-species/transport/mcp/schemas/plant-species-find-by-id.schema';
 
 @McpTool()
 @Injectable()
