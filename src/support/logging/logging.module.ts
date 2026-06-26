@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+import { createSharedWinstonLoggerOptions } from '@sisques-labs/nestjs-kit';
+import { WinstonModule } from 'nest-winston';
+
+@Module({
+  imports: [
+    WinstonModule.forRoot(
+      createSharedWinstonLoggerOptions({
+        service: 'gardenia-plant-species-service',
+      }),
+    ),
+  ],
+  exports: [WinstonModule],
+})
+export class LoggingModule {}
