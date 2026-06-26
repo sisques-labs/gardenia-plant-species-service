@@ -4,6 +4,7 @@ import {
   ValueObject,
 } from '@sisques-labs/nestjs-kit';
 
+import { PlantSpeciesAuthorshipInvalidException } from '@contexts/plant-species/domain/exceptions/plant-species-authorship-invalid.exception';
 import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
 import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-authorship.primitives';
 
@@ -39,8 +40,8 @@ export class PlantSpeciesAuthorshipValueObject extends ValueObject<IPlantSpecies
       author != null &&
       author.length > PlantSpeciesAuthorshipValueObject.MAX_AUTHOR_LENGTH
     ) {
-      throw new Error(
-        `Plant species authorship author exceeds ${PlantSpeciesAuthorshipValueObject.MAX_AUTHOR_LENGTH} characters`,
+      throw new PlantSpeciesAuthorshipInvalidException(
+        `author exceeds ${PlantSpeciesAuthorshipValueObject.MAX_AUTHOR_LENGTH} characters`,
       );
     }
 
@@ -52,8 +53,8 @@ export class PlantSpeciesAuthorshipValueObject extends ValueObject<IPlantSpecies
         year < PlantSpeciesAuthorshipValueObject.MIN_YEAR ||
         year > nextYear
       ) {
-        throw new Error(
-          `Plant species authorship year must be an integer between ${PlantSpeciesAuthorshipValueObject.MIN_YEAR} and ${nextYear}`,
+        throw new PlantSpeciesAuthorshipInvalidException(
+          `year must be an integer between ${PlantSpeciesAuthorshipValueObject.MIN_YEAR} and ${nextYear}`,
         );
       }
     }

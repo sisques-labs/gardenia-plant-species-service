@@ -1,5 +1,6 @@
 import { StringValueObject, ValueObject } from '@sisques-labs/nestjs-kit';
 
+import { PlantSpeciesClassificationInvalidException } from '@contexts/plant-species/domain/exceptions/plant-species-classification-invalid.exception';
 import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
 import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-classification.primitives';
 
@@ -51,8 +52,8 @@ export class PlantSpeciesClassificationValueObject extends ValueObject<IPlantSpe
         v != null &&
         v.length > PlantSpeciesClassificationValueObject.MAX_LENGTH
       ) {
-        throw new Error(
-          `Plant species classification field "${field}" exceeds ${PlantSpeciesClassificationValueObject.MAX_LENGTH} characters`,
+        throw new PlantSpeciesClassificationInvalidException(
+          `field "${field}" exceeds ${PlantSpeciesClassificationValueObject.MAX_LENGTH} characters`,
         );
       }
     }

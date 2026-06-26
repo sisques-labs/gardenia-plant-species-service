@@ -1,5 +1,6 @@
 import { StringValueObject, ValueObject } from '@sisques-labs/nestjs-kit';
 
+import { PlantSpeciesCommonNameInvalidException } from '@contexts/plant-species/domain/exceptions/plant-species-common-name-invalid.exception';
 import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
 import { IPlantSpeciesCommonNamePrimitives } from '@contexts/plant-species/domain/primitives/plant-species-common-name.primitives';
 
@@ -32,11 +33,13 @@ export class PlantSpeciesCommonNameValueObject extends ValueObject<IPlantSpecies
   protected validate(): void {
     const name = this._value.name.value;
     if (name.length === 0) {
-      throw new Error('Plant species common name must not be empty');
+      throw new PlantSpeciesCommonNameInvalidException(
+        'name must not be empty',
+      );
     }
     if (name.length > PlantSpeciesCommonNameValueObject.MAX_NAME_LENGTH) {
-      throw new Error(
-        `Plant species common name exceeds ${PlantSpeciesCommonNameValueObject.MAX_NAME_LENGTH} characters`,
+      throw new PlantSpeciesCommonNameInvalidException(
+        `name exceeds ${PlantSpeciesCommonNameValueObject.MAX_NAME_LENGTH} characters`,
       );
     }
     const language = this._value.language?.value ?? null;
@@ -44,8 +47,8 @@ export class PlantSpeciesCommonNameValueObject extends ValueObject<IPlantSpecies
       language != null &&
       language.length > PlantSpeciesCommonNameValueObject.MAX_LANGUAGE_LENGTH
     ) {
-      throw new Error(
-        `Plant species common name language exceeds ${PlantSpeciesCommonNameValueObject.MAX_LANGUAGE_LENGTH} characters`,
+      throw new PlantSpeciesCommonNameInvalidException(
+        `language exceeds ${PlantSpeciesCommonNameValueObject.MAX_LANGUAGE_LENGTH} characters`,
       );
     }
   }

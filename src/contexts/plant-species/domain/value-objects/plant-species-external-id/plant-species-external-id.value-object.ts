@@ -1,5 +1,6 @@
 import { StringValueObject, ValueObject } from '@sisques-labs/nestjs-kit';
 
+import { PlantSpeciesExternalIdInvalidException } from '@contexts/plant-species/domain/exceptions/plant-species-external-id-invalid.exception';
 import { IPlantSpeciesExternalId } from '@contexts/plant-species/domain/interfaces/plant-species-external-id.interface';
 import { IPlantSpeciesExternalIdPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-external-id.primitives';
 
@@ -28,20 +29,24 @@ export class PlantSpeciesExternalIdValueObject extends ValueObject<IPlantSpecies
   protected validate(): void {
     const scheme = this._value.scheme.value;
     if (scheme.length === 0) {
-      throw new Error('Plant species external id scheme must not be empty');
+      throw new PlantSpeciesExternalIdInvalidException(
+        'scheme must not be empty',
+      );
     }
     if (scheme.length > PlantSpeciesExternalIdValueObject.MAX_SCHEME_LENGTH) {
-      throw new Error(
-        `Plant species external id scheme exceeds ${PlantSpeciesExternalIdValueObject.MAX_SCHEME_LENGTH} characters`,
+      throw new PlantSpeciesExternalIdInvalidException(
+        `scheme exceeds ${PlantSpeciesExternalIdValueObject.MAX_SCHEME_LENGTH} characters`,
       );
     }
     const value = this._value.value.value;
     if (value.length === 0) {
-      throw new Error('Plant species external id value must not be empty');
+      throw new PlantSpeciesExternalIdInvalidException(
+        'value must not be empty',
+      );
     }
     if (value.length > PlantSpeciesExternalIdValueObject.MAX_VALUE_LENGTH) {
-      throw new Error(
-        `Plant species external id value exceeds ${PlantSpeciesExternalIdValueObject.MAX_VALUE_LENGTH} characters`,
+      throw new PlantSpeciesExternalIdInvalidException(
+        `value exceeds ${PlantSpeciesExternalIdValueObject.MAX_VALUE_LENGTH} characters`,
       );
     }
   }

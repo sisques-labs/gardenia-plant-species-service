@@ -4,6 +4,7 @@ import {
   ValueObject,
 } from '@sisques-labs/nestjs-kit';
 
+import { PlantSpeciesImageInvalidException } from '@contexts/plant-species/domain/exceptions/plant-species-image-invalid.exception';
 import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
 import { IPlantSpeciesImagePrimitives } from '@contexts/plant-species/domain/primitives/plant-species-image.primitives';
 
@@ -31,11 +32,11 @@ export class PlantSpeciesImageValueObject extends ValueObject<IPlantSpeciesImage
   protected validate(): void {
     const url = this._value.url.value;
     if (url.length === 0) {
-      throw new Error('Plant species image URL must not be empty');
+      throw new PlantSpeciesImageInvalidException('url must not be empty');
     }
     if (url.length > PlantSpeciesImageValueObject.MAX_URL_LENGTH) {
-      throw new Error(
-        `Plant species image URL exceeds ${PlantSpeciesImageValueObject.MAX_URL_LENGTH} characters`,
+      throw new PlantSpeciesImageInvalidException(
+        `url exceeds ${PlantSpeciesImageValueObject.MAX_URL_LENGTH} characters`,
       );
     }
   }
