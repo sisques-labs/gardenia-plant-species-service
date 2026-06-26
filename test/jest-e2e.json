@@ -9,5 +9,6 @@
   "moduleNameMapper": {
     "^@contexts/(.*)$": "<rootDir>/../src/contexts/$1",
     "^@core/(.*)$": "<rootDir>/../src/core/$1"
-  }
+  },
+  "forceExit": true
 }
