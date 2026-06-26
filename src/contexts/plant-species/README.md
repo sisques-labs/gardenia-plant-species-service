@@ -32,8 +32,8 @@ directly into the shared DB; this service reads and serves them.
 
 | Command | Purpose |
 |---------|---------|
-| `CreatePlantSpeciesCommand` | Add a species to the catalog |
-| `UpdatePlantSpeciesCommand` | Update a species |
+| `CreatePlantSpeciesCommand` | Add a species to the catalog (full field set: scientificName, description, imageUrl, classification, authorship, growthHabit, wikipediaUrl, commonNames, images, externalIds) |
+| `UpdatePlantSpeciesCommand` | Update a species (any of the create fields; only provided fields change) |
 | `DeletePlantSpeciesCommand` | Remove a species |
 | `IngestPlantSpeciesCommand` | Enqueue species names for the worker to consume |
 

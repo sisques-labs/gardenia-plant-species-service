@@ -75,10 +75,25 @@ export class PlantSpeciesController {
   async createPlantSpecies(
     @Body() dto: CreatePlantSpeciesDto,
   ): Promise<PlantSpeciesRestResponseDto> {
+    this.logger.log(`Creating plant species: ${dto.scientificName}`);
+
     const plantSpeciesId = await this.commandBus.execute<
       CreatePlantSpeciesCommand,
       string
-    >(new CreatePlantSpeciesCommand({ scientificName: dto.scientificName }));
+    >(
+      new CreatePlantSpeciesCommand({
+        scientificName: dto.scientificName,
+        description: dto.description,
+        imageUrl: dto.imageUrl,
+        classification: dto.classification,
+        authorship: dto.authorship,
+        growthHabit: dto.growthHabit,
+        wikipediaUrl: dto.wikipediaUrl,
+        commonNames: dto.commonNames,
+        images: dto.images,
+        externalIds: dto.externalIds,
+      }),
+    );
 
     const vm = await this.queryBus.execute<
       PlantSpeciesFindByIdQuery,
@@ -150,12 +165,21 @@ export class PlantSpeciesController {
     @Param('id') id: string,
     @Body() dto: UpdatePlantSpeciesDto,
   ): Promise<PlantSpeciesRestResponseDto> {
+    this.logger.log(`Updating plant species: ${id}`);
+
     await this.commandBus.execute(
       new UpdatePlantSpeciesCommand({
         id,
         scientificName: dto.scientificName,
         description: dto.description,
         imageUrl: dto.imageUrl,
+        classification: dto.classification,
+        authorship: dto.authorship,
+        growthHabit: dto.growthHabit,
+        wikipediaUrl: dto.wikipediaUrl,
+        commonNames: dto.commonNames,
+        images: dto.images,
+        externalIds: dto.externalIds,
       }),
     );
 

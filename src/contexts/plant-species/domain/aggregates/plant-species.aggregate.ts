@@ -68,6 +68,13 @@ export class PlantSpeciesAggregate extends BaseAggregate {
     scientificName?: PlantSpeciesScientificNameValueObject;
     description?: PlantSpeciesDescriptionValueObject | null;
     imageUrl?: PlantSpeciesImageUrlValueObject | null;
+    classification?: PlantSpeciesClassificationValueObject | null;
+    authorship?: PlantSpeciesAuthorshipValueObject | null;
+    growthHabit?: PlantSpeciesGrowthHabitValueObject | null;
+    wikipediaUrl?: PlantSpeciesWikipediaUrlValueObject | null;
+    commonNames?: PlantSpeciesCommonNameValueObject[];
+    images?: PlantSpeciesImageValueObject[];
+    externalIds?: PlantSpeciesExternalIdValueObject[];
   }): void {
     if (props.scientificName !== undefined) {
       this.changeScientificName(props.scientificName);
@@ -79,6 +86,44 @@ export class PlantSpeciesAggregate extends BaseAggregate {
 
     if (props.imageUrl !== undefined) {
       this.changeImageUrl(props.imageUrl);
+    }
+
+    // Taxonomy / external-source fields are replaced wholesale (like at
+    // construction): they carry no per-field "changed" events — the catch-all
+    // PlantSpeciesUpdatedEvent below records the new state.
+    if (props.classification !== undefined) {
+      this._classification = props.classification;
+      this.touch();
+    }
+
+    if (props.authorship !== undefined) {
+      this._authorship = props.authorship;
+      this.touch();
+    }
+
+    if (props.growthHabit !== undefined) {
+      this._growthHabit = props.growthHabit;
+      this.touch();
+    }
+
+    if (props.wikipediaUrl !== undefined) {
+      this._wikipediaUrl = props.wikipediaUrl;
+      this.touch();
+    }
+
+    if (props.commonNames !== undefined) {
+      this._commonNames = props.commonNames;
+      this.touch();
+    }
+
+    if (props.images !== undefined) {
+      this._images = props.images;
+      this.touch();
+    }
+
+    if (props.externalIds !== undefined) {
+      this._externalIds = props.externalIds;
+      this.touch();
     }
 
     this.apply(

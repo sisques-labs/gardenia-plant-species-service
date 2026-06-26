@@ -45,6 +45,13 @@ export class UpdatePlantSpeciesCommandHandler
       scientificName: command.scientificName,
       description: command.description,
       imageUrl: command.imageUrl,
+      classification: command.classification,
+      authorship: command.authorship,
+      growthHabit: command.growthHabit,
+      wikipediaUrl: command.wikipediaUrl,
+      commonNames: command.commonNames,
+      images: command.images,
+      externalIds: command.externalIds,
     });
 
     await this.plantSpeciesWriteRepository.save(plantSpecies);

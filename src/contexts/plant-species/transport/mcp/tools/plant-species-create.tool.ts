@@ -4,7 +4,10 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 import { McpTool } from '@core/mcp/decorators/mcp-tool.decorator';
 import { IMcpTool } from '@core/mcp/interfaces/mcp-tool.interface';
-import { CreatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/create-plant-species/create-plant-species.command';
+import {
+  CreatePlantSpeciesCommand,
+  CreatePlantSpeciesCommandInput,
+} from '@contexts/plant-species/application/commands/create-plant-species/create-plant-species.command';
 import { plantSpeciesCreateSchema } from '@contexts/plant-species/transport/mcp/schemas/plant-species-create.schema';
 
 @McpTool()
@@ -20,11 +23,11 @@ export class PlantSpeciesCreateMcpTool implements IMcpTool {
   constructor(private readonly commandBus: CommandBus) {}
 
   async execute(args: Record<string, unknown>): Promise<CallToolResult> {
-    const { scientificName } = args as { scientificName: string };
-    this.logger.log(`Creating plant species: ${scientificName}`);
+    const input = args as unknown as CreatePlantSpeciesCommandInput;
+    this.logger.log(`Creating plant species: ${input.scientificName}`);
 
     const id = await this.commandBus.execute<CreatePlantSpeciesCommand, string>(
-      new CreatePlantSpeciesCommand({ scientificName }),
+      new CreatePlantSpeciesCommand(input),
     );
 
     return {

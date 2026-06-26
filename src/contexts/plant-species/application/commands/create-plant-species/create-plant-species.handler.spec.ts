@@ -1,5 +1,6 @@
 import { EventBus } from '@nestjs/cqrs';
 
+import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
 import { PlantSpeciesBuilder } from '@contexts/plant-species/domain/builders/plant-species.builder';
 import { IPlantSpeciesWriteRepository } from '@contexts/plant-species/domain/repositories/write/plant-species-write.repository';
 import { AssertPlantSpeciesNameAvailableService } from '@contexts/plant-species/application/services/write/assert-plant-species-name-available/assert-plant-species-name-available.service';
@@ -83,5 +84,49 @@ describe('CreatePlantSpeciesCommandHandler', () => {
     await handler.execute(command);
 
     expect(eventBus.publishAll).toHaveBeenCalledTimes(1);
+  });
+
+  it('persists the enriched taxonomy/external fields', async () => {
+    const command = new CreatePlantSpeciesCommand({
+      scientificName: 'Rosa canina',
+      description: 'A deciduous shrub',
+      imageUrl: 'https://example.com/rosa.jpg',
+      classification: {
+        kingdom: 'Plantae',
+        phylum: null,
+        class: null,
+        order: null,
+        family: 'Rosaceae',
+        genus: 'Rosa',
+        specificEpithet: 'canina',
+        rank: 'SPECIES',
+      },
+      authorship: { author: 'L.', year: 1753 },
+      growthHabit: PlantSpeciesGrowthHabitEnum.SHRUB,
+      wikipediaUrl: 'https://en.wikipedia.org/wiki/Rosa_canina',
+      commonNames: [{ name: 'Dog rose', language: 'en' }],
+      images: [{ url: 'https://example.com/rosa.jpg', isPrimary: true }],
+      externalIds: [{ scheme: 'GBIF', value: '2705959' }],
+    });
+
+    await handler.execute(command);
+
+    const savedAggregate = writeRepository.save.mock.calls[0][0];
+    const primitives = savedAggregate.toPrimitives();
+    expect(primitives.classification?.family).toBe('Rosaceae');
+    expect(primitives.authorship?.year).toBe(1753);
+    expect(primitives.growthHabit).toBe(PlantSpeciesGrowthHabitEnum.SHRUB);
+    expect(primitives.wikipediaUrl).toBe(
+      'https://en.wikipedia.org/wiki/Rosa_canina',
+    );
+    expect(primitives.commonNames).toEqual([
+      { name: 'Dog rose', language: 'en' },
+    ]);
+    expect(primitives.images).toEqual([
+      { url: 'https://example.com/rosa.jpg', isPrimary: true },
+    ]);
+    expect(primitives.externalIds).toEqual([
+      { scheme: 'GBIF', value: '2705959' },
+    ]);
   });
 });

@@ -2,6 +2,7 @@ import { EventBus } from '@nestjs/cqrs';
 import { DateValueObject } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
+import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
 import { PlantSpeciesNameAlreadyExistsException } from '@contexts/plant-species/domain/exceptions/plant-species-name-already-exists.exception';
 import { PlantSpeciesNotFoundException } from '@contexts/plant-species/domain/exceptions/plant-species-not-found.exception';
 import { IPlantSpeciesWriteRepository } from '@contexts/plant-species/domain/repositories/write/plant-species-write.repository';
@@ -147,6 +148,32 @@ describe('UpdatePlantSpeciesCommandHandler', () => {
     await handler.execute(command);
 
     expect(eventBus.publishAll).toHaveBeenCalledTimes(1);
+  });
+
+  it('updates the enriched taxonomy/external fields', async () => {
+    const command = new UpdatePlantSpeciesCommand({
+      id: PLANT_SPECIES_ID,
+      growthHabit: PlantSpeciesGrowthHabitEnum.SHRUB,
+      wikipediaUrl: 'https://en.wikipedia.org/wiki/Rosa_canina',
+      commonNames: [{ name: 'Dog rose', language: 'en' }],
+      externalIds: [{ scheme: 'GBIF', value: '2705959' }],
+    });
+
+    await handler.execute(command);
+
+    const savedAggregate = writeRepository.save.mock.calls[0][0];
+    const primitives = savedAggregate.toPrimitives();
+    expect(primitives.growthHabit).toBe(PlantSpeciesGrowthHabitEnum.SHRUB);
+    expect(primitives.wikipediaUrl).toBe(
+      'https://en.wikipedia.org/wiki/Rosa_canina',
+    );
+    expect(primitives.commonNames).toEqual([
+      { name: 'Dog rose', language: 'en' },
+    ]);
+    expect(primitives.externalIds).toEqual([
+      { scheme: 'GBIF', value: '2705959' },
+    ]);
+    expect(assertNameAvailable.execute).not.toHaveBeenCalled();
   });
 
   it('throws PlantSpeciesNotFoundException when species does not exist', async () => {

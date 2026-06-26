@@ -3,6 +3,7 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { BaseCommandHandler, UuidValueObject } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
+import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
 import { PlantSpeciesBuilder } from '@contexts/plant-species/domain/builders/plant-species.builder';
 import {
   IPlantSpeciesWriteRepository,
@@ -38,6 +39,19 @@ export class CreatePlantSpeciesCommandHandler
     const plantSpecies = this.plantSpeciesBuilder
       .withId(UuidValueObject.generate().value)
       .withScientificName(command.scientificName.value)
+      .withDescription(command.description?.value ?? null)
+      .withImageUrl(command.imageUrl?.value ?? null)
+      .withClassification(command.classification?.value ?? null)
+      .withAuthorship(command.authorship?.value ?? null)
+      .withGrowthHabit(
+        (command.growthHabit?.value as PlantSpeciesGrowthHabitEnum) ?? null,
+      )
+      .withWikipediaUrl(command.wikipediaUrl?.value ?? null)
+      .withCommonNames(command.commonNames.map((name) => name.value))
+      .withImages(command.images.map((image) => image.value))
+      .withExternalIds(
+        command.externalIds.map((externalId) => externalId.value),
+      )
       .withCreatedAt(now)
       .withUpdatedAt(now)
       .build();

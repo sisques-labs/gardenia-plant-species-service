@@ -4,7 +4,10 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 import { McpTool } from '@core/mcp/decorators/mcp-tool.decorator';
 import { IMcpTool } from '@core/mcp/interfaces/mcp-tool.interface';
-import { UpdatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/update-plant-species/update-plant-species.command';
+import {
+  UpdatePlantSpeciesCommand,
+  UpdatePlantSpeciesCommandInput,
+} from '@contexts/plant-species/application/commands/update-plant-species/update-plant-species.command';
 import { plantSpeciesUpdateSchema } from '@contexts/plant-species/transport/mcp/schemas/plant-species-update.schema';
 
 @McpTool()
@@ -21,25 +24,15 @@ export class PlantSpeciesUpdateMcpTool implements IMcpTool {
   constructor(private readonly commandBus: CommandBus) {}
 
   async execute(args: Record<string, unknown>): Promise<CallToolResult> {
-    const { id, scientificName, description, imageUrl } = args as {
-      id: string;
-      scientificName?: string;
-      description?: string | null;
-      imageUrl?: string | null;
-    };
-    this.logger.log(`Updating plant species: ${id}`);
+    const input = args as unknown as UpdatePlantSpeciesCommandInput;
+    this.logger.log(`Updating plant species: ${input.id}`);
 
-    await this.commandBus.execute(
-      new UpdatePlantSpeciesCommand({
-        id,
-        scientificName,
-        description,
-        imageUrl,
-      }),
-    );
+    await this.commandBus.execute(new UpdatePlantSpeciesCommand(input));
 
     return {
-      content: [{ type: 'text', text: JSON.stringify({ success: true, id }) }],
+      content: [
+        { type: 'text', text: JSON.stringify({ success: true, id: input.id }) },
+      ],
     };
   }
 }

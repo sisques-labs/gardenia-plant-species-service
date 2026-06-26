@@ -39,6 +39,15 @@ export class PlantSpeciesMutationsResolver {
     >(
       new CreatePlantSpeciesCommand({
         scientificName: input.scientificName,
+        description: input.description,
+        imageUrl: input.imageUrl,
+        classification: input.classification,
+        authorship: input.authorship,
+        growthHabit: input.growthHabit,
+        wikipediaUrl: input.wikipediaUrl,
+        commonNames: input.commonNames,
+        images: input.images,
+        externalIds: input.externalIds,
       }),
     );
 
@@ -61,6 +70,13 @@ export class PlantSpeciesMutationsResolver {
         scientificName: input.scientificName,
         description: input.description,
         imageUrl: input.imageUrl,
+        classification: input.classification,
+        authorship: input.authorship,
+        growthHabit: input.growthHabit,
+        wikipediaUrl: input.wikipediaUrl,
+        commonNames: input.commonNames,
+        images: input.images,
+        externalIds: input.externalIds,
       }),
     );
 
