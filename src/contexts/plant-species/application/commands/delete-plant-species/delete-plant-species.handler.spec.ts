@@ -2,13 +2,11 @@ import { EventBus } from '@nestjs/cqrs';
 import { DateValueObject } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
-import { PlantSpeciesInUseException } from '@contexts/plant-species/domain/exceptions/plant-species-in-use.exception';
 import { PlantSpeciesNotFoundException } from '@contexts/plant-species/domain/exceptions/plant-species-not-found.exception';
 import { IPlantSpeciesWriteRepository } from '@contexts/plant-species/domain/repositories/write/plant-species-write.repository';
 import { PlantSpeciesIdValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-id/plant-species-id.value-object';
 import { PlantSpeciesScientificNameValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-scientific-name/plant-species-scientific-name.value-object';
 import { AssertPlantSpeciesExistsService } from '@contexts/plant-species/application/services/write/assert-plant-species-exists/assert-plant-species-exists.service';
-import { AssertPlantSpeciesNotInUseService } from '@contexts/plant-species/application/services/write/assert-plant-species-not-in-use/assert-plant-species-not-in-use.service';
 
 import { DeletePlantSpeciesCommand } from './delete-plant-species.command';
 import { DeletePlantSpeciesCommandHandler } from './delete-plant-species.handler';
@@ -37,7 +35,6 @@ describe('DeletePlantSpeciesCommandHandler', () => {
   let handler: DeletePlantSpeciesCommandHandler;
   let writeRepository: jest.Mocked<IPlantSpeciesWriteRepository>;
   let assertExists: jest.Mocked<AssertPlantSpeciesExistsService>;
-  let assertNotInUse: jest.Mocked<AssertPlantSpeciesNotInUseService>;
   let eventBus: jest.Mocked<EventBus>;
 
   beforeEach(() => {
@@ -55,10 +52,6 @@ describe('DeletePlantSpeciesCommandHandler', () => {
       execute: jest.fn().mockResolvedValue(buildAggregate()),
     } as unknown as jest.Mocked<AssertPlantSpeciesExistsService>;
 
-    assertNotInUse = {
-      execute: jest.fn().mockResolvedValue(undefined),
-    } as unknown as jest.Mocked<AssertPlantSpeciesNotInUseService>;
-
     eventBus = {
       publish: jest.fn(),
       publishAll: jest.fn(),
@@ -67,7 +60,6 @@ describe('DeletePlantSpeciesCommandHandler', () => {
     handler = new DeletePlantSpeciesCommandHandler(
       writeRepository,
       assertExists,
-      assertNotInUse,
       eventBus,
     );
   });
@@ -78,7 +70,6 @@ describe('DeletePlantSpeciesCommandHandler', () => {
     await handler.execute(command);
 
     expect(assertExists.execute).toHaveBeenCalledTimes(1);
-    expect(assertNotInUse.execute).toHaveBeenCalledTimes(1);
     expect(writeRepository.delete).toHaveBeenCalledWith(PLANT_SPECIES_ID);
     expect(eventBus.publishAll).toHaveBeenCalledTimes(1);
   });
@@ -92,20 +83,6 @@ describe('DeletePlantSpeciesCommandHandler', () => {
 
     await expect(handler.execute(command)).rejects.toBeInstanceOf(
       PlantSpeciesNotFoundException,
-    );
-    expect(writeRepository.delete).not.toHaveBeenCalled();
-    expect(eventBus.publishAll).not.toHaveBeenCalled();
-  });
-
-  it('throws PlantSpeciesInUseException and does not delete when species is referenced', async () => {
-    assertNotInUse.execute.mockRejectedValue(
-      new PlantSpeciesInUseException(PLANT_SPECIES_ID),
-    );
-
-    const command = new DeletePlantSpeciesCommand({ id: PLANT_SPECIES_ID });
-
-    await expect(handler.execute(command)).rejects.toBeInstanceOf(
-      PlantSpeciesInUseException,
     );
     expect(writeRepository.delete).not.toHaveBeenCalled();
     expect(eventBus.publishAll).not.toHaveBeenCalled();

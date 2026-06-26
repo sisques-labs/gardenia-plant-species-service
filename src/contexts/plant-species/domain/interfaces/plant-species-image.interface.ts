@@ -1,5 +1,13 @@
-/** A single image of a species. `isPrimary` flags the preferred/cover image. */
+import {
+  BooleanValueObject,
+  StringValueObject,
+} from '@sisques-labs/nestjs-kit';
+
+/**
+ * A single species image expressed as value objects. `isPrimary` flags the
+ * preferred/cover image. See IPlantSpeciesImagePrimitives for the serialized form.
+ */
 export interface IPlantSpeciesImage {
-  url: string;
-  isPrimary: boolean;
+  url: StringValueObject;
+  isPrimary: BooleanValueObject;
 }

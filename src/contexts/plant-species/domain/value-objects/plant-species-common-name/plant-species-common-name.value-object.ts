@@ -1,43 +1,48 @@
-import { ValueObject } from '@sisques-labs/nestjs-kit';
+import { StringValueObject, ValueObject } from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
+import { IPlantSpeciesCommonNamePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-common-name-primitives.interface';
 
-export class PlantSpeciesCommonNameValueObject extends ValueObject<IPlantSpeciesCommonName> {
+export class PlantSpeciesCommonNameValueObject extends ValueObject<IPlantSpeciesCommonNamePrimitives> {
   static readonly MAX_NAME_LENGTH = 255;
   static readonly MAX_LANGUAGE_LENGTH = 16;
 
   private readonly _value: IPlantSpeciesCommonName;
 
-  constructor(value: IPlantSpeciesCommonName) {
+  constructor(value: IPlantSpeciesCommonNamePrimitives) {
     super();
     const language = value.language?.trim();
     this._value = {
-      name: value.name.trim(),
-      language: language != null && language.length > 0 ? language : null,
+      name: new StringValueObject(value.name.trim()),
+      language:
+        language != null && language.length > 0
+          ? new StringValueObject(language)
+          : null,
     };
     this.validate();
   }
 
-  get value(): IPlantSpeciesCommonName {
-    return { ...this._value };
+  get value(): IPlantSpeciesCommonNamePrimitives {
+    return {
+      name: this._value.name.value,
+      language: this._value.language?.value ?? null,
+    };
   }
 
   protected validate(): void {
-    if (this._value.name.length === 0) {
+    const name = this._value.name.value;
+    if (name.length === 0) {
       throw new Error('Plant species common name must not be empty');
     }
-    if (
-      this._value.name.length >
-      PlantSpeciesCommonNameValueObject.MAX_NAME_LENGTH
-    ) {
+    if (name.length > PlantSpeciesCommonNameValueObject.MAX_NAME_LENGTH) {
       throw new Error(
         `Plant species common name exceeds ${PlantSpeciesCommonNameValueObject.MAX_NAME_LENGTH} characters`,
       );
     }
+    const language = this._value.language?.value ?? null;
     if (
-      this._value.language != null &&
-      this._value.language.length >
-        PlantSpeciesCommonNameValueObject.MAX_LANGUAGE_LENGTH
+      language != null &&
+      language.length > PlantSpeciesCommonNameValueObject.MAX_LANGUAGE_LENGTH
     ) {
       throw new Error(
         `Plant species common name language exceeds ${PlantSpeciesCommonNameValueObject.MAX_LANGUAGE_LENGTH} characters`,

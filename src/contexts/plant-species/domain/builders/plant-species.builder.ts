@@ -6,11 +6,11 @@ import {
 } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
-import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
-import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
-import { IPlantSpeciesExternalId } from '@contexts/plant-species/domain/interfaces/plant-species-external-id.interface';
-import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
+import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-authorship-primitives.interface';
+import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-classification-primitives.interface';
+import { IPlantSpeciesCommonNamePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-common-name-primitives.interface';
+import { IPlantSpeciesExternalIdPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-external-id-primitives.interface';
+import { IPlantSpeciesImagePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-image-primitives.interface';
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
 import { PlantSpeciesAuthorshipValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-authorship/plant-species-authorship.value-object';
 import { PlantSpeciesClassificationValueObject } from '@contexts/plant-species/domain/value-objects/plant-species-classification/plant-species-classification.value-object';
@@ -33,13 +33,13 @@ export class PlantSpeciesBuilder extends BaseBuilder<
   private _scientificName!: string;
   private _description: string | null = null;
   private _imageUrl: string | null = null;
-  private _classification: IPlantSpeciesClassification | null = null;
-  private _authorship: IPlantSpeciesAuthorship | null = null;
+  private _classification: IPlantSpeciesClassificationPrimitives | null = null;
+  private _authorship: IPlantSpeciesAuthorshipPrimitives | null = null;
   private _growthHabit: PlantSpeciesGrowthHabitEnum | null = null;
   private _wikipediaUrl: string | null = null;
-  private _commonNames: IPlantSpeciesCommonName[] = [];
-  private _images: IPlantSpeciesImage[] = [];
-  private _externalIds: IPlantSpeciesExternalId[] = [];
+  private _commonNames: IPlantSpeciesCommonNamePrimitives[] = [];
+  private _images: IPlantSpeciesImagePrimitives[] = [];
+  private _externalIds: IPlantSpeciesExternalIdPrimitives[] = [];
 
   withScientificName(scientificName: string): this {
     this._scientificName = scientificName;
@@ -56,12 +56,14 @@ export class PlantSpeciesBuilder extends BaseBuilder<
     return this;
   }
 
-  withClassification(classification: IPlantSpeciesClassification | null): this {
+  withClassification(
+    classification: IPlantSpeciesClassificationPrimitives | null,
+  ): this {
     this._classification = classification;
     return this;
   }
 
-  withAuthorship(authorship: IPlantSpeciesAuthorship | null): this {
+  withAuthorship(authorship: IPlantSpeciesAuthorshipPrimitives | null): this {
     this._authorship = authorship;
     return this;
   }
@@ -76,17 +78,17 @@ export class PlantSpeciesBuilder extends BaseBuilder<
     return this;
   }
 
-  withCommonNames(commonNames: IPlantSpeciesCommonName[]): this {
+  withCommonNames(commonNames: IPlantSpeciesCommonNamePrimitives[]): this {
     this._commonNames = commonNames;
     return this;
   }
 
-  withImages(images: IPlantSpeciesImage[]): this {
+  withImages(images: IPlantSpeciesImagePrimitives[]): this {
     this._images = images;
     return this;
   }
 
-  withExternalIds(externalIds: IPlantSpeciesExternalId[]): this {
+  withExternalIds(externalIds: IPlantSpeciesExternalIdPrimitives[]): this {
     this._externalIds = externalIds;
     return this;
   }

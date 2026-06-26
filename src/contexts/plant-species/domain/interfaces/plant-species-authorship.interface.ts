@@ -1,8 +1,10 @@
+import { NumberValueObject, StringValueObject } from '@sisques-labs/nestjs-kit';
+
 /**
- * Nomenclatural authorship of a species name, e.g. author "L." and year 1753 for
- * Linnaeus. Both fields are optional since not every source supplies them.
+ * Nomenclatural authorship of a species name expressed as value objects.
+ * See IPlantSpeciesAuthorshipPrimitives for the serialized (primitive) form.
  */
 export interface IPlantSpeciesAuthorship {
-  author: string | null;
-  year: number | null;
+  author: StringValueObject | null;
+  year: NumberValueObject | null;
 }

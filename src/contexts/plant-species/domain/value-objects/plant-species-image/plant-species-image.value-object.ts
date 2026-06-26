@@ -1,30 +1,39 @@
-import { ValueObject } from '@sisques-labs/nestjs-kit';
+import {
+  BooleanValueObject,
+  StringValueObject,
+  ValueObject,
+} from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
+import { IPlantSpeciesImagePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-image-primitives.interface';
 
-export class PlantSpeciesImageValueObject extends ValueObject<IPlantSpeciesImage> {
+export class PlantSpeciesImageValueObject extends ValueObject<IPlantSpeciesImagePrimitives> {
   static readonly MAX_URL_LENGTH = 500;
 
   private readonly _value: IPlantSpeciesImage;
 
-  constructor(value: IPlantSpeciesImage) {
+  constructor(value: IPlantSpeciesImagePrimitives) {
     super();
     this._value = {
-      url: value.url.trim(),
-      isPrimary: value.isPrimary,
+      url: new StringValueObject(value.url.trim()),
+      isPrimary: new BooleanValueObject(value.isPrimary),
     };
     this.validate();
   }
 
-  get value(): IPlantSpeciesImage {
-    return { ...this._value };
+  get value(): IPlantSpeciesImagePrimitives {
+    return {
+      url: this._value.url.value,
+      isPrimary: this._value.isPrimary.value,
+    };
   }
 
   protected validate(): void {
-    if (this._value.url.length === 0) {
+    const url = this._value.url.value;
+    if (url.length === 0) {
       throw new Error('Plant species image URL must not be empty');
     }
-    if (this._value.url.length > PlantSpeciesImageValueObject.MAX_URL_LENGTH) {
+    if (url.length > PlantSpeciesImageValueObject.MAX_URL_LENGTH) {
       throw new Error(
         `Plant species image URL exceeds ${PlantSpeciesImageValueObject.MAX_URL_LENGTH} characters`,
       );

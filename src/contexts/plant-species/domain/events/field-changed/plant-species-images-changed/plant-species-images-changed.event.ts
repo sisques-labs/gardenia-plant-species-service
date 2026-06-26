@@ -4,14 +4,14 @@ import {
   IFieldChangedEventData,
 } from '@sisques-labs/nestjs-kit';
 
-import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
+import { IPlantSpeciesImagePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-image-primitives.interface';
 
 export class PlantSpeciesImagesChangedEvent extends BaseEvent<
-  IFieldChangedEventData<IPlantSpeciesImage[]>
+  IFieldChangedEventData<IPlantSpeciesImagePrimitives[]>
 > {
   constructor(
     metadata: IEventMetadata,
-    data: IFieldChangedEventData<IPlantSpeciesImage[]>,
+    data: IFieldChangedEventData<IPlantSpeciesImagePrimitives[]>,
   ) {
     super(metadata, data);
   }

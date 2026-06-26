@@ -1,6 +1,11 @@
-/** A vernacular (common) name in a given language. */
+import { StringValueObject } from '@sisques-labs/nestjs-kit';
+
+/**
+ * Vernacular (common) name in a given language expressed as value objects.
+ * See IPlantSpeciesCommonNamePrimitives for the serialized (primitive) form.
+ */
 export interface IPlantSpeciesCommonName {
-  name: string;
-  /** BCP-47 / ISO-639 language code (e.g. "en", "es"), or null when unknown. */
-  language: string | null;
+  name: StringValueObject;
+  /** BCP-47 / ISO-639 language code, or null when unknown. */
+  language: StringValueObject | null;
 }

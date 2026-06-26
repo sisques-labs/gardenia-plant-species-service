@@ -1,45 +1,45 @@
-import { ValueObject } from '@sisques-labs/nestjs-kit';
+import { StringValueObject, ValueObject } from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesExternalId } from '@contexts/plant-species/domain/interfaces/plant-species-external-id.interface';
+import { IPlantSpeciesExternalIdPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-external-id-primitives.interface';
 
-export class PlantSpeciesExternalIdValueObject extends ValueObject<IPlantSpeciesExternalId> {
+export class PlantSpeciesExternalIdValueObject extends ValueObject<IPlantSpeciesExternalIdPrimitives> {
   static readonly MAX_SCHEME_LENGTH = 32;
   static readonly MAX_VALUE_LENGTH = 255;
 
   private readonly _value: IPlantSpeciesExternalId;
 
-  constructor(value: IPlantSpeciesExternalId) {
+  constructor(value: IPlantSpeciesExternalIdPrimitives) {
     super();
     this._value = {
-      scheme: value.scheme.trim(),
-      value: value.value.trim(),
+      scheme: new StringValueObject(value.scheme.trim()),
+      value: new StringValueObject(value.value.trim()),
     };
     this.validate();
   }
 
-  get value(): IPlantSpeciesExternalId {
-    return { ...this._value };
+  get value(): IPlantSpeciesExternalIdPrimitives {
+    return {
+      scheme: this._value.scheme.value,
+      value: this._value.value.value,
+    };
   }
 
   protected validate(): void {
-    if (this._value.scheme.length === 0) {
+    const scheme = this._value.scheme.value;
+    if (scheme.length === 0) {
       throw new Error('Plant species external id scheme must not be empty');
     }
-    if (
-      this._value.scheme.length >
-      PlantSpeciesExternalIdValueObject.MAX_SCHEME_LENGTH
-    ) {
+    if (scheme.length > PlantSpeciesExternalIdValueObject.MAX_SCHEME_LENGTH) {
       throw new Error(
         `Plant species external id scheme exceeds ${PlantSpeciesExternalIdValueObject.MAX_SCHEME_LENGTH} characters`,
       );
     }
-    if (this._value.value.length === 0) {
+    const value = this._value.value.value;
+    if (value.length === 0) {
       throw new Error('Plant species external id value must not be empty');
     }
-    if (
-      this._value.value.length >
-      PlantSpeciesExternalIdValueObject.MAX_VALUE_LENGTH
-    ) {
+    if (value.length > PlantSpeciesExternalIdValueObject.MAX_VALUE_LENGTH) {
       throw new Error(
         `Plant species external id value exceeds ${PlantSpeciesExternalIdValueObject.MAX_VALUE_LENGTH} characters`,
       );

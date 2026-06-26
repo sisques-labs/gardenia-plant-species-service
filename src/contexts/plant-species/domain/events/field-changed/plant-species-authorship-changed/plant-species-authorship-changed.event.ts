@@ -4,14 +4,14 @@ import {
   IFieldChangedEventData,
 } from '@sisques-labs/nestjs-kit';
 
-import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
+import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-authorship-primitives.interface';
 
 export class PlantSpeciesAuthorshipChangedEvent extends BaseEvent<
-  IFieldChangedEventData<IPlantSpeciesAuthorship | null>
+  IFieldChangedEventData<IPlantSpeciesAuthorshipPrimitives | null>
 > {
   constructor(
     metadata: IEventMetadata,
-    data: IFieldChangedEventData<IPlantSpeciesAuthorship | null>,
+    data: IFieldChangedEventData<IPlantSpeciesAuthorshipPrimitives | null>,
   ) {
     super(metadata, data);
   }

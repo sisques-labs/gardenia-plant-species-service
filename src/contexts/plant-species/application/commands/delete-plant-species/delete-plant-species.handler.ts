@@ -8,7 +8,6 @@ import {
   PLANT_SPECIES_WRITE_REPOSITORY,
 } from '@contexts/plant-species/domain/repositories/write/plant-species-write.repository';
 import { AssertPlantSpeciesExistsService } from '@contexts/plant-species/application/services/write/assert-plant-species-exists/assert-plant-species-exists.service';
-import { AssertPlantSpeciesNotInUseService } from '@contexts/plant-species/application/services/write/assert-plant-species-not-in-use/assert-plant-species-not-in-use.service';
 
 import { DeletePlantSpeciesCommand } from './delete-plant-species.command';
 
@@ -23,7 +22,6 @@ export class DeletePlantSpeciesCommandHandler
     @Inject(PLANT_SPECIES_WRITE_REPOSITORY)
     private readonly plantSpeciesWriteRepository: IPlantSpeciesWriteRepository,
     private readonly assertPlantSpeciesExistsService: AssertPlantSpeciesExistsService,
-    private readonly assertPlantSpeciesNotInUseService: AssertPlantSpeciesNotInUseService,
     eventBus: EventBus,
   ) {
     super(eventBus);
@@ -33,8 +31,6 @@ export class DeletePlantSpeciesCommandHandler
     const plantSpecies = await this.assertPlantSpeciesExistsService.execute(
       command.id,
     );
-
-    await this.assertPlantSpeciesNotInUseService.execute(command.id);
 
     plantSpecies.delete();
 

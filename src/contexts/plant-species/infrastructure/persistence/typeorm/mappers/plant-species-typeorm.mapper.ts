@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
-import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
+import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-authorship-primitives.interface';
+import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-classification-primitives.interface';
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
 import { PlantSpeciesBuilder } from '@contexts/plant-species/domain/builders/plant-species.builder';
 import { PlantSpeciesCommonNameTypeOrmEntity } from '@contexts/plant-species/infrastructure/persistence/typeorm/entities/plant-species-common-name.entity';
@@ -107,8 +107,8 @@ export class PlantSpeciesTypeOrmMapper {
 
   private toClassification(
     entity: PlantSpeciesTypeOrmEntity,
-  ): IPlantSpeciesClassification | null {
-    const classification: IPlantSpeciesClassification = {
+  ): IPlantSpeciesClassificationPrimitives | null {
+    const classification: IPlantSpeciesClassificationPrimitives = {
       kingdom: entity.kingdom ?? null,
       phylum: entity.phylum ?? null,
       class: entity.taxonClass ?? null,
@@ -125,7 +125,7 @@ export class PlantSpeciesTypeOrmMapper {
 
   private toAuthorship(
     entity: PlantSpeciesTypeOrmEntity,
-  ): IPlantSpeciesAuthorship | null {
+  ): IPlantSpeciesAuthorshipPrimitives | null {
     if (entity.nameAuthorship == null && entity.namePublishedInYear == null) {
       return null;
     }

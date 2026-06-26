@@ -9,17 +9,14 @@ import { DeletePlantSpeciesCommandHandler } from './application/commands/delete-
 import { IngestPlantSpeciesCommandHandler } from './application/commands/ingest-plant-species/ingest-plant-species.handler';
 import { UpdatePlantSpeciesCommandHandler } from './application/commands/update-plant-species/update-plant-species.handler';
 import { PLANT_SPECIES_QUEUE_PORT } from './application/ports/plant-species-queue.port';
-import { PLANT_SPECIES_REFERENCE_PORT } from './application/ports/plant-species-reference.port';
 import { PlantSpeciesFindByCriteriaQueryHandler } from './application/queries/plant-species-find-by-criteria/plant-species-find-by-criteria.handler';
 import { PlantSpeciesFindByIdQueryHandler } from './application/queries/plant-species-find-by-id/plant-species-find-by-id.handler';
 import { AssertPlantSpeciesViewModelExistsService } from './application/services/read/assert-plant-species-view-model-exists/assert-plant-species-view-model-exists.service';
 import { AssertPlantSpeciesExistsService } from './application/services/write/assert-plant-species-exists/assert-plant-species-exists.service';
 import { AssertPlantSpeciesNameAvailableService } from './application/services/write/assert-plant-species-name-available/assert-plant-species-name-available.service';
-import { AssertPlantSpeciesNotInUseService } from './application/services/write/assert-plant-species-not-in-use/assert-plant-species-not-in-use.service';
 import { PlantSpeciesBuilder } from './domain/builders/plant-species.builder';
 import { PLANT_SPECIES_READ_REPOSITORY } from './domain/repositories/read/plant-species-read.repository';
 import { PLANT_SPECIES_WRITE_REPOSITORY } from './domain/repositories/write/plant-species-write.repository';
-import { PlantSpeciesReferenceAdapter } from './infrastructure/adapters/plant-species-reference.adapter';
 import { RedisPlantSpeciesQueueAdapter } from './infrastructure/adapters/redis-plant-species-queue.adapter';
 import { plantSpeciesRedisClientProvider } from './infrastructure/redis/plant-species-redis.client';
 import { PlantSpeciesCommonNameTypeOrmEntity } from './infrastructure/persistence/typeorm/entities/plant-species-common-name.entity';
@@ -57,7 +54,6 @@ const APPLICATION_SERVICES = [
   AssertPlantSpeciesViewModelExistsService,
   AssertPlantSpeciesExistsService,
   AssertPlantSpeciesNameAvailableService,
-  AssertPlantSpeciesNotInUseService,
 ];
 
 const DOMAIN_BUILDERS = [PlantSpeciesBuilder];
@@ -84,10 +80,6 @@ const INFRASTRUCTURE_REPOSITORIES = [
 
 const INFRASTRUCTURE_ADAPTERS = [
   plantSpeciesRedisClientProvider,
-  {
-    provide: PLANT_SPECIES_REFERENCE_PORT,
-    useClass: PlantSpeciesReferenceAdapter,
-  },
   {
     provide: PLANT_SPECIES_QUEUE_PORT,
     useClass: RedisPlantSpeciesQueueAdapter,

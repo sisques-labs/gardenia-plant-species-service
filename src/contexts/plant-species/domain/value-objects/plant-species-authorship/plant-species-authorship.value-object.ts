@@ -1,44 +1,56 @@
-import { ValueObject } from '@sisques-labs/nestjs-kit';
+import {
+  NumberValueObject,
+  StringValueObject,
+  ValueObject,
+} from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
+import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-authorship-primitives.interface';
 
-export class PlantSpeciesAuthorshipValueObject extends ValueObject<IPlantSpeciesAuthorship> {
+export class PlantSpeciesAuthorshipValueObject extends ValueObject<IPlantSpeciesAuthorshipPrimitives> {
   static readonly MAX_AUTHOR_LENGTH = 255;
   static readonly MIN_YEAR = 1500;
 
   private readonly _value: IPlantSpeciesAuthorship;
 
-  constructor(value: IPlantSpeciesAuthorship) {
+  constructor(value: IPlantSpeciesAuthorshipPrimitives) {
     super();
     const author = value.author?.trim();
     this._value = {
-      author: author != null && author.length > 0 ? author : null,
-      year: value.year ?? null,
+      author:
+        author != null && author.length > 0
+          ? new StringValueObject(author)
+          : null,
+      year: value.year != null ? new NumberValueObject(value.year) : null,
     };
     this.validate();
   }
 
-  get value(): IPlantSpeciesAuthorship {
-    return { ...this._value };
+  get value(): IPlantSpeciesAuthorshipPrimitives {
+    return {
+      author: this._value.author?.value ?? null,
+      year: this._value.year?.value ?? null,
+    };
   }
 
   protected validate(): void {
+    const author = this._value.author?.value ?? null;
     if (
-      this._value.author != null &&
-      this._value.author.length >
-        PlantSpeciesAuthorshipValueObject.MAX_AUTHOR_LENGTH
+      author != null &&
+      author.length > PlantSpeciesAuthorshipValueObject.MAX_AUTHOR_LENGTH
     ) {
       throw new Error(
         `Plant species authorship author exceeds ${PlantSpeciesAuthorshipValueObject.MAX_AUTHOR_LENGTH} characters`,
       );
     }
 
-    if (this._value.year != null) {
+    const year = this._value.year?.value ?? null;
+    if (year != null) {
       const nextYear = new Date().getFullYear() + 1;
       if (
-        !Number.isInteger(this._value.year) ||
-        this._value.year < PlantSpeciesAuthorshipValueObject.MIN_YEAR ||
-        this._value.year > nextYear
+        !Number.isInteger(year) ||
+        year < PlantSpeciesAuthorshipValueObject.MIN_YEAR ||
+        year > nextYear
       ) {
         throw new Error(
           `Plant species authorship year must be an integer between ${PlantSpeciesAuthorshipValueObject.MIN_YEAR} and ${nextYear}`,

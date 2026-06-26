@@ -1,24 +1,24 @@
 import { BaseViewModel } from '@sisques-labs/nestjs-kit';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
-import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
-import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
-import { IPlantSpeciesExternalId } from '@contexts/plant-species/domain/interfaces/plant-species-external-id.interface';
-import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
+import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-authorship-primitives.interface';
+import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-classification-primitives.interface';
+import { IPlantSpeciesCommonNamePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-common-name-primitives.interface';
+import { IPlantSpeciesExternalIdPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-external-id-primitives.interface';
+import { IPlantSpeciesImagePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-image-primitives.interface';
 import { IPlantSpeciesPrimitives } from '@contexts/plant-species/domain/primitives/plant-species.primitives';
 
 export class PlantSpeciesViewModel extends BaseViewModel {
   public readonly scientificName: string;
   public readonly description: string | null;
   public readonly imageUrl: string | null;
-  public readonly classification: IPlantSpeciesClassification | null;
-  public readonly authorship: IPlantSpeciesAuthorship | null;
+  public readonly classification: IPlantSpeciesClassificationPrimitives | null;
+  public readonly authorship: IPlantSpeciesAuthorshipPrimitives | null;
   public readonly growthHabit: PlantSpeciesGrowthHabitEnum | null;
   public readonly wikipediaUrl: string | null;
-  public readonly commonNames: IPlantSpeciesCommonName[];
-  public readonly images: IPlantSpeciesImage[];
-  public readonly externalIds: IPlantSpeciesExternalId[];
+  public readonly commonNames: IPlantSpeciesCommonNamePrimitives[];
+  public readonly images: IPlantSpeciesImagePrimitives[];
+  public readonly externalIds: IPlantSpeciesExternalIdPrimitives[];
 
   constructor(props: IPlantSpeciesPrimitives) {
     super(props.id, props.createdAt, props.updatedAt);
