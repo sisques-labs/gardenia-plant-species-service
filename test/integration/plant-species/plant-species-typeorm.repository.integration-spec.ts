@@ -79,7 +79,7 @@ describe('PlantSpecies TypeORM repositories (integration)', () => {
   });
 
   beforeEach(async () => {
-    await entityRepo.clear();
+    await dataSource.query('TRUNCATE TABLE "plant_species" CASCADE');
   });
 
   it('persists an aggregate and reads it back by id', async () => {
