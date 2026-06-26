@@ -1,0 +1,118 @@
+import { Logger } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import {
+  MutationResponseDto,
+  MutationResponseGraphQLMapper,
+} from '@sisques-labs/nestjs-kit';
+
+import { CreatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/create-plant-species/create-plant-species.command';
+import { DeletePlantSpeciesCommand } from '@contexts/plant-species/application/commands/delete-plant-species/delete-plant-species.command';
+import { IngestPlantSpeciesCommand } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.command';
+import { IngestPlantSpeciesResult } from '@contexts/plant-species/application/commands/ingest-plant-species/ingest-plant-species.result';
+import { UpdatePlantSpeciesCommand } from '@contexts/plant-species/application/commands/update-plant-species/update-plant-species.command';
+
+import { PlantSpeciesCreateRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-create.request.dto';
+import { PlantSpeciesDeleteRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-delete.request.dto';
+import { PlantSpeciesIngestRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-ingest.request.dto';
+import { PlantSpeciesUpdateRequestDto } from '@contexts/plant-species/transport/graphql/dtos/requests/plant-species-update.request.dto';
+import { IngestPlantSpeciesResultResponseDto } from '@contexts/plant-species/transport/graphql/dtos/responses/ingest-plant-species-result.response.dto';
+
+@Resolver()
+export class PlantSpeciesMutationsResolver {
+  private readonly logger = new Logger(PlantSpeciesMutationsResolver.name);
+
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly mutationResponseGraphQLMapper: MutationResponseGraphQLMapper,
+  ) {}
+
+  @Mutation(() => MutationResponseDto)
+  async createPlantSpecies(
+    @Args('input') input: PlantSpeciesCreateRequestDto,
+  ): Promise<MutationResponseDto> {
+    this.logger.log(`Creating plant species: ${input.scientificName}`);
+
+    const plantSpeciesId = await this.commandBus.execute<
+      CreatePlantSpeciesCommand,
+      string
+    >(
+      new CreatePlantSpeciesCommand({
+        scientificName: input.scientificName,
+        description: input.description,
+        imageUrl: input.imageUrl,
+        classification: input.classification,
+        authorship: input.authorship,
+        growthHabit: input.growthHabit,
+        wikipediaUrl: input.wikipediaUrl,
+        commonNames: input.commonNames,
+        images: input.images,
+        externalIds: input.externalIds,
+      }),
+    );
+
+    return this.mutationResponseGraphQLMapper.toResponseDto({
+      success: true,
+      message: 'Plant species created successfully',
+      id: plantSpeciesId,
+    });
+  }
+
+  @Mutation(() => MutationResponseDto)
+  async updatePlantSpecies(
+    @Args('input') input: PlantSpeciesUpdateRequestDto,
+  ): Promise<MutationResponseDto> {
+    this.logger.log(`Updating plant species: ${input.id}`);
+
+    await this.commandBus.execute(
+      new UpdatePlantSpeciesCommand({
+        id: input.id,
+        scientificName: input.scientificName,
+        description: input.description,
+        imageUrl: input.imageUrl,
+        classification: input.classification,
+        authorship: input.authorship,
+        growthHabit: input.growthHabit,
+        wikipediaUrl: input.wikipediaUrl,
+        commonNames: input.commonNames,
+        images: input.images,
+        externalIds: input.externalIds,
+      }),
+    );
+
+    return this.mutationResponseGraphQLMapper.toResponseDto({
+      success: true,
+      message: 'Plant species updated successfully',
+      id: input.id,
+    });
+  }
+
+  @Mutation(() => MutationResponseDto)
+  async deletePlantSpecies(
+    @Args('input') input: PlantSpeciesDeleteRequestDto,
+  ): Promise<MutationResponseDto> {
+    this.logger.log(`Deleting plant species: ${input.id}`);
+
+    await this.commandBus.execute(
+      new DeletePlantSpeciesCommand({ id: input.id }),
+    );
+
+    return this.mutationResponseGraphQLMapper.toResponseDto({
+      success: true,
+      message: 'Plant species deleted successfully',
+      id: input.id,
+    });
+  }
+
+  @Mutation(() => IngestPlantSpeciesResultResponseDto)
+  async ingestPlantSpecies(
+    @Args('input') input: PlantSpeciesIngestRequestDto,
+  ): Promise<IngestPlantSpeciesResultResponseDto> {
+    this.logger.log(`Ingesting ${input.names.length} plant species name(s)`);
+
+    return this.commandBus.execute<
+      IngestPlantSpeciesCommand,
+      IngestPlantSpeciesResult
+    >(new IngestPlantSpeciesCommand({ names: input.names }));
+  }
+}
