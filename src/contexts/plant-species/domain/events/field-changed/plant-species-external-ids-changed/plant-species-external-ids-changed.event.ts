@@ -4,7 +4,7 @@ import {
   IFieldChangedEventData,
 } from '@sisques-labs/nestjs-kit';
 
-import { IPlantSpeciesExternalIdPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-external-id-primitives.interface';
+import { IPlantSpeciesExternalIdPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-external-id.primitives';
 
 export class PlantSpeciesExternalIdsChangedEvent extends BaseEvent<
   IFieldChangedEventData<IPlantSpeciesExternalIdPrimitives[]>

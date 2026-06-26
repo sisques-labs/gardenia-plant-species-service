@@ -4,7 +4,7 @@ import {
   IFieldChangedEventData,
 } from '@sisques-labs/nestjs-kit';
 
-import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-classification-primitives.interface';
+import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-classification.primitives';
 
 export class PlantSpeciesClassificationChangedEvent extends BaseEvent<
   IFieldChangedEventData<IPlantSpeciesClassificationPrimitives | null>

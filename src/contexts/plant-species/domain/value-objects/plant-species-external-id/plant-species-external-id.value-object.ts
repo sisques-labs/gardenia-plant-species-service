@@ -1,7 +1,7 @@
 import { StringValueObject, ValueObject } from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesExternalId } from '@contexts/plant-species/domain/interfaces/plant-species-external-id.interface';
-import { IPlantSpeciesExternalIdPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-external-id-primitives.interface';
+import { IPlantSpeciesExternalIdPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-external-id.primitives';
 
 export class PlantSpeciesExternalIdValueObject extends ValueObject<IPlantSpeciesExternalIdPrimitives> {
   static readonly MAX_SCHEME_LENGTH = 32;

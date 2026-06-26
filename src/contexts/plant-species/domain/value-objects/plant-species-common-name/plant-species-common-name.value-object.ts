@@ -1,7 +1,7 @@
 import { StringValueObject, ValueObject } from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesCommonName } from '@contexts/plant-species/domain/interfaces/plant-species-common-name.interface';
-import { IPlantSpeciesCommonNamePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-common-name-primitives.interface';
+import { IPlantSpeciesCommonNamePrimitives } from '@contexts/plant-species/domain/primitives/plant-species-common-name.primitives';
 
 export class PlantSpeciesCommonNameValueObject extends ValueObject<IPlantSpeciesCommonNamePrimitives> {
   static readonly MAX_NAME_LENGTH = 255;

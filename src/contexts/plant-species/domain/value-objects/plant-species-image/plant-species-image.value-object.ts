@@ -5,7 +5,7 @@ import {
 } from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesImage } from '@contexts/plant-species/domain/interfaces/plant-species-image.interface';
-import { IPlantSpeciesImagePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-image-primitives.interface';
+import { IPlantSpeciesImagePrimitives } from '@contexts/plant-species/domain/primitives/plant-species-image.primitives';
 
 export class PlantSpeciesImageValueObject extends ValueObject<IPlantSpeciesImagePrimitives> {
   static readonly MAX_URL_LENGTH = 500;

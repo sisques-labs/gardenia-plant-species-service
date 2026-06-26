@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 import { PlantSpeciesGrowthHabitEnum } from '@contexts/plant-species/domain/enums/plant-species-growth-habit.enum';
-import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-authorship-primitives.interface';
-import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-classification-primitives.interface';
+import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-authorship.primitives';
+import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-classification.primitives';
 import { PlantSpeciesAggregate } from '@contexts/plant-species/domain/aggregates/plant-species.aggregate';
 import { PlantSpeciesBuilder } from '@contexts/plant-species/domain/builders/plant-species.builder';
 import { PlantSpeciesCommonNameTypeOrmEntity } from '@contexts/plant-species/infrastructure/persistence/typeorm/entities/plant-species-common-name.entity';

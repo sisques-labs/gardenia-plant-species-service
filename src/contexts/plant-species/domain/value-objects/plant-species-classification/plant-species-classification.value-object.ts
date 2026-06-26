@@ -1,7 +1,7 @@
 import { StringValueObject, ValueObject } from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesClassification } from '@contexts/plant-species/domain/interfaces/plant-species-classification.interface';
-import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-classification-primitives.interface';
+import { IPlantSpeciesClassificationPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-classification.primitives';
 
 export class PlantSpeciesClassificationValueObject extends ValueObject<IPlantSpeciesClassificationPrimitives> {
   static readonly MAX_LENGTH = 255;

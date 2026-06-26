@@ -71,18 +71,9 @@ export class PlantSpeciesAggregate extends BaseAggregate {
     );
   }
 
-  public update(props: {
-    scientificName?: PlantSpeciesScientificNameValueObject;
-    description?: PlantSpeciesDescriptionValueObject | null;
-    imageUrl?: PlantSpeciesImageUrlValueObject | null;
-    classification?: PlantSpeciesClassificationValueObject | null;
-    authorship?: PlantSpeciesAuthorshipValueObject | null;
-    growthHabit?: PlantSpeciesGrowthHabitValueObject | null;
-    wikipediaUrl?: PlantSpeciesWikipediaUrlValueObject | null;
-    commonNames?: PlantSpeciesCommonNameValueObject[];
-    images?: PlantSpeciesImageValueObject[];
-    externalIds?: PlantSpeciesExternalIdValueObject[];
-  }): void {
+  public update(
+    props: Partial<Omit<IPlantSpecies, 'id' | 'createdAt' | 'updatedAt'>>,
+  ): void {
     if (props.scientificName !== undefined) {
       this.changeScientificName(props.scientificName);
     }

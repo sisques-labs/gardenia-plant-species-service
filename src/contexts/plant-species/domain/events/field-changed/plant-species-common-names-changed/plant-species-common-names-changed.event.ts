@@ -4,7 +4,7 @@ import {
   IFieldChangedEventData,
 } from '@sisques-labs/nestjs-kit';
 
-import { IPlantSpeciesCommonNamePrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-common-name-primitives.interface';
+import { IPlantSpeciesCommonNamePrimitives } from '@contexts/plant-species/domain/primitives/plant-species-common-name.primitives';
 
 export class PlantSpeciesCommonNamesChangedEvent extends BaseEvent<
   IFieldChangedEventData<IPlantSpeciesCommonNamePrimitives[]>

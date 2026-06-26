@@ -5,7 +5,7 @@ import {
 } from '@sisques-labs/nestjs-kit';
 
 import { IPlantSpeciesAuthorship } from '@contexts/plant-species/domain/interfaces/plant-species-authorship.interface';
-import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/interfaces/plant-species-authorship-primitives.interface';
+import { IPlantSpeciesAuthorshipPrimitives } from '@contexts/plant-species/domain/primitives/plant-species-authorship.primitives';
 
 export class PlantSpeciesAuthorshipValueObject extends ValueObject<IPlantSpeciesAuthorshipPrimitives> {
   static readonly MAX_AUTHOR_LENGTH = 255;
